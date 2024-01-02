@@ -5,10 +5,18 @@ import React from "react";
 // Image
 import Image from "next/image";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+
+// Next-Intl
 import { useTranslations } from "next-intl";
+
+// Antd
 import { Button, Divider, Input } from "antd";
-import { KeyRound, Mail } from "lucide-react";
 import Password from "antd/es/input/Password";
+
+// Lucide Icon
+import { KeyRound, Mail } from "lucide-react";
+
+// Google Icon Component
 import GoogleIcon from "@/components/icons/GoogleIcon";
 
 const LoginPage = () => {
@@ -19,12 +27,12 @@ const LoginPage = () => {
       <div className="relative z-20">
         <Image
           className="w-full object-cover z-20"
-          src={"/images/hero/hero_image_2.jpg"}
+          src={"/images/hero/hero_image.jpg"}
           alt="hero image"
           width={1920}
           height={300}
         />
-        <div className=" absolute top-[20%] mx-auto text-white font-extrabold w-full text-center px-8">
+        <div className=" absolute top-[30%] mx-auto text-white font-extrabold w-full text-center px-8">
           <p className="text-2xl mb-3">BangKuoka</p>
           <p className="text-sm">The best place for find events in Bangkok and Fukuoka.</p>
         </div>
