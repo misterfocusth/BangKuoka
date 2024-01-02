@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import { getRequestConfig } from "next-intl/server";
-import { IntlError, IntlErrorCode } from "next-intl";
 
 const locales = ["en", "ja", "th"];
 

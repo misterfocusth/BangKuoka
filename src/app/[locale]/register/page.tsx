@@ -1,18 +1,31 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import { Button, Checkbox, DatePicker, Divider, Input, Select } from "antd";
-import { ImagePlus, KeyRound, Mail, Phone } from "lucide-react";
-import { useTranslations } from "next-intl";
+// React
 import React, { useState } from "react";
+
+// Antd
+import { Button, Checkbox, DatePicker, Divider, Input, Select } from "antd";
+import TextArea from "antd/es/input/TextArea";
+import Password from "antd/es/input/Password";
+
+// Lucide Icons
+import { ImagePlus, KeyRound, Mail, Phone } from "lucide-react";
+
+// Components
+import Navbar from "@/components/Navbar";
+import GoogleIcon from "@/components/icons/GoogleIcon";
+
+// Next Intl
+import { useTranslations } from "next-intl";
 
 // dayjs
 import dayjs from "dayjs";
 import { Group, RadioChangeEvent } from "antd/es/radio";
-import TextArea from "antd/es/input/TextArea";
-import Password from "antd/es/input/Password";
-import GoogleIcon from "@/components/icons/GoogleIcon";
+
+// Navigation
 import { useRouter } from "@/navigation";
+
+const dateFormat = "DD MMMM YYYY";
 
 const RegisterPage = () => {
   const router = useRouter();
@@ -22,8 +35,6 @@ const RegisterPage = () => {
   const [selectedNationality, setSelectedNationality] = useState<"TH" | "JP">("TH");
   const [address, setAddress] = useState<String>("");
   const [isAcceptTerms, setIsAcceptTerms] = useState<Boolean>(false);
-
-  const dateFormat = "DD MMMM YYYY";
 
   const genderOptions = [
     { label: t("sex_male_label"), value: "MALE" },
