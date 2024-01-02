@@ -18,8 +18,10 @@ import { KeyRound, Mail } from "lucide-react";
 
 // Google Icon Component
 import GoogleIcon from "@/components/icons/GoogleIcon";
+import { useRouter } from "@/navigation";
 
 const LoginPage = () => {
+  const router = useRouter();
   const t = useTranslations("Index");
 
   return (
@@ -42,7 +44,7 @@ const LoginPage = () => {
         </div>
       </div>
 
-      <div className=" absolute w-full top-[32%] bg-white z-30 rounded-t-3xl p-8 shadow">
+      <div className=" absolute w-full top-[30%] bg-white z-30 rounded-t-3xl p-8 shadow">
         <p className="text-2xl font-bold mb-3">{t("login_title")}</p>
         <p className=" text-[#555555]">{t("login_subtitle")}</p>
 
@@ -85,7 +87,14 @@ const LoginPage = () => {
 
         <div className="text-center mt-8">
           <p className="mb-2">{t("dont_have_account_label")}</p>
-          <p className="font-bold text-[#136912]">{t("register_new_account")}</p>
+          <p
+            className="font-bold text-[#136912]"
+            onClick={() => {
+              router.push("/register");
+            }}
+          >
+            {t("register_new_account")}
+          </p>
         </div>
       </div>
     </div>
