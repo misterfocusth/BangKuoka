@@ -1,10 +1,9 @@
-"use client";
-
 import "../globals.css";
 
 // Antd
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
+import { NextIntlClientProvider, useMessages } from "next-intl";
 
 export default function RootLayout({
   children,
@@ -14,7 +13,7 @@ export default function RootLayout({
   params: { locale: string };
 }) {
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <title>BangKuoka</title>
         <meta
@@ -31,10 +30,13 @@ export default function RootLayout({
                 colorInfo: "#136912",
                 borderRadius: 12,
                 colorPrimaryBg: "#1677ff00",
+                fontFamily: "Noto Sans",
               },
             }}
           >
-            {children}
+            <NextIntlClientProvider locale={locale} messages={useMessages()}>
+              {children}
+            </NextIntlClientProvider>
           </ConfigProvider>
         </AntdRegistry>
       </body>

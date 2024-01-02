@@ -16,7 +16,7 @@ const items: MenuProps["items"] = [
     label: "🇺🇸 English",
   },
   {
-    key: "jp",
+    key: "ja",
     label: "🇯🇵 Japanese",
   },
   {
@@ -28,14 +28,14 @@ const items: MenuProps["items"] = [
 const LanguageSwitcher = () => {
   const router = useRouter();
   const currentPath = usePathname();
-  const [selectedLang, setSelectedLang] = useState<"en" | "jp" | "th">("en");
+  const [selectedLang, setSelectedLang] = useState<"en" | "ja" | "th">("en");
 
   useEffect(() => {
     const currentLang = window.location.pathname.split("/")[1];
     if (currentLang === "en") {
       setSelectedLang("en");
-    } else if (currentLang === "jp") {
-      setSelectedLang("jp");
+    } else if (currentLang === "ja") {
+      setSelectedLang("ja");
     } else if (currentLang === "th") {
       setSelectedLang("th");
     }
