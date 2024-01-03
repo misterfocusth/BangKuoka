@@ -1,0 +1,32 @@
+{
+    "theme_color": "#136912",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "name": "BangKuoka",
+    "short_name": "BangKuoka",
+    "description": "The best place for finding, booking, and attending events in Bangkok and Fukuoka - This project is a part of the Specialized Youth Exchange Program (SYEP2024) powered by the Bangkok Metropolitan Administration (BMA) and Fukuoka Prefectural Government.",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
