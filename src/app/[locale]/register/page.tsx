@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 
 // Antd
-import { Button, Checkbox, DatePicker, Divider, Input, Select } from "antd";
+import { Button, Checkbox, DatePicker, DatePickerProps, Divider, Input, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import Password from "antd/es/input/Password";
 
@@ -47,6 +47,15 @@ const RegisterPage = () => {
     setSelectedGender(value);
   };
 
+  const onChange: DatePickerProps["onChange"] = (date, dateString) => {
+    console.log(date, dateString);
+    console.log(typeof date, typeof dateString);
+  };
+
+  const handleRegister = () => {
+    router.push("/landing/1");
+  };
+
   return (
     <div className="h-full min-h-screen">
       <Navbar title={t("register_new_account_label")} showLanguageSwitcher />
@@ -70,6 +79,7 @@ const RegisterPage = () => {
             defaultValue={dayjs("18 December 2003", dateFormat)}
             format={dateFormat}
             className="w-full h-12"
+            onChange={onChange}
           />
         </div>
 
@@ -169,6 +179,7 @@ const RegisterPage = () => {
           className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center"
           size="large"
           type="primary"
+          onClick={handleRegister}
         >
           {t("register_new_account_label")}
         </Button>

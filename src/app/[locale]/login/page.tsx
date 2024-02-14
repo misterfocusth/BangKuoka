@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useContext } from "react";
 
 // Image
 import Image from "next/image";
@@ -20,9 +20,22 @@ import { KeyRound, Mail } from "lucide-react";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useRouter } from "@/navigation";
 
+import firebaseApp from "../../config/firebaseConfig";
+import { AuthContext } from "@/contexts/AuthContext";
+
 const LoginPage = () => {
+  const authContenxt = useContext(AuthContext);
+
   const router = useRouter();
   const t = useTranslations("Index");
+
+  const handleLogin = () => {
+    const isLoggedIn = authContenxt.login();
+
+    if (isLoggedIn) {
+      router.push("/home");
+    }
+  };
 
   return (
     <div className=" relative min-h-screen z-10">
@@ -70,6 +83,7 @@ const LoginPage = () => {
           className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center"
           size="large"
           type="primary"
+          onClick={handleLogin}
         >
           {t("login_button_title")}
         </Button>

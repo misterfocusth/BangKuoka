@@ -8,8 +8,13 @@ import { useRouter } from "@/navigation";
 interface NavbarProps {
   title?: String;
   showLanguageSwitcher?: boolean;
+  hidden?: boolean;
 }
-const Navbar: React.FC<NavbarProps> = ({ title = "", showLanguageSwitcher = false }) => {
+const Navbar: React.FC<NavbarProps> = ({
+  title = "",
+  showLanguageSwitcher = false,
+  hidden = false,
+}) => {
   const router = useRouter();
 
   const handleGoBack = () => {
@@ -17,10 +22,14 @@ const Navbar: React.FC<NavbarProps> = ({ title = "", showLanguageSwitcher = fals
   };
 
   return (
-    <div className="flex flex-row items-center justify-between p-4 shadow">
-      <ChevronLeft onClick={handleGoBack} />
-      <p className="m-0 font-bold text-[#136912]">{title}</p>
-      {showLanguageSwitcher ? <LanguageSwitcher /> : <div></div>}
+    <div>
+      {!hidden && (
+        <div className="flex flex-row items-center justify-between p-4 shadow">
+          <ChevronLeft onClick={handleGoBack} />
+          <p className="m-0 font-bold text-[#136912]">{title}</p>
+          {showLanguageSwitcher ? <LanguageSwitcher /> : <div></div>}
+        </div>
+      )}
     </div>
   );
 };

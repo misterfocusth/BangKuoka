@@ -1,9 +1,11 @@
+import AuthContextProvider from "@/contexts/AuthContext";
 import "../globals.css";
 
 // Antd
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
 import { NextIntlClientProvider, useMessages } from "next-intl";
+import NavbarContextProvider from "@/contexts/NavbarContext";
 
 export default function RootLayout({
   children,
@@ -37,7 +39,9 @@ export default function RootLayout({
             }}
           >
             <NextIntlClientProvider locale={locale} messages={useMessages()}>
-              {children}
+              <AuthContextProvider>
+                <NavbarContextProvider>{children}</NavbarContextProvider>
+              </AuthContextProvider>
             </NextIntlClientProvider>
           </ConfigProvider>
         </AntdRegistry>
