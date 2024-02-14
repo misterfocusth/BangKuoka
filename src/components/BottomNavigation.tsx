@@ -23,10 +23,10 @@ const BottomNavigation = () => {
     } else if (currentPath.includes("profile")) {
       setCurrentTab(3);
     }
-  }, []);
+  }, [router]);
 
   return (
-    <div className="p-4 border-t px-12 flex items-center justify-between fixed bottom-0 w-full">
+    <div className="p-4 border-t px-12 flex items-center justify-between fixed bottom-0 w-full bg-white">
       <div onClick={() => handleTabChange(0)}>
         {currentTab == 0 ? (
           <div className="flex items-center gap-2 bg-green-100 py-2 rounded-xl px-4">
@@ -62,7 +62,7 @@ const BottomNavigation = () => {
 
       <div onClick={() => handleTabChange(3)}>
         {currentTab == 3 ? (
-          <div className="flex items-center gap-2 bg-green-100 py-2 rounded-xl px-4 hover:shadow">
+          <div className="flex items-center gap-2 bg-green-100 py-2 rounded-xl px-4">
             <UserRound color="#136912" />
             <p className="m-0 text-[#136912]">Profile</p>
           </div>

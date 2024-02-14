@@ -16,7 +16,7 @@ const AuthenUserLayout = ({ children }: { children: React.ReactNode }) => {
         showLanguageSwitcher={navbarContext.isShowLanguageSwitcher}
         hidden={!navbarContext.isShowNavbar}
       />
-      <div className="p-6 h-[90vh]">{children}</div>
+      <div className="p-6 min-h-screen">{children}</div>
       <BottomNavigation />
     </div>
   );
