@@ -3,6 +3,7 @@
 import EventCard from "@/components/card/EventCard";
 import OrganizerCard from "@/components/card/OrganizerCard";
 import { AuthContext } from "@/contexts/AuthContext";
+import { NavbarContext } from "@/contexts/NavbarContext";
 import { EVENTS } from "@/mock/events";
 import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
@@ -21,6 +22,8 @@ const HomePage = () => {
   const router = useRouter();
   const authContext = useContext(AuthContext);
 
+  const navbarContext = useContext(NavbarContext);
+
   const [eventLocation, setEventLocation] = useState<String>("Bangkok");
 
   const onSearch: SearchProps["onSearch"] = (value, _e, info) => console.log(info?.source, value);
@@ -29,6 +32,10 @@ const HomePage = () => {
     console.log(date, dateString);
     console.log(typeof date, typeof dateString);
   };
+
+  useEffect(() => {
+    navbarContext.setNavbarTitle("BangKuoka");
+  }, [navbarContext]);
 
   return (
     <div className="mb-32">

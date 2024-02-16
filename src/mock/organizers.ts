@@ -1,4 +1,6 @@
-export const ORGANIZERS = [
+import { Organizer } from "@/app/types/organizer";
+
+export const ORGANIZERS: Organizer[] = [
   {
     id: "1",
     name: "Bangkok Metropolitan Administration",
@@ -26,7 +28,7 @@ export const ORGANIZERS = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
     credential_id: null,
-    event: ["1"],
+    event: ["2"],
     icon_image_src: "/images/organizers/fk.png",
   },
 ];

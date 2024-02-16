@@ -1,7 +1,8 @@
 import React from "react";
+import SavedEventPageClient from "./SavedEventPageClient";
 
 const SavedPage = () => {
-  return <div>SavedPage</div>;
+  return <SavedEventPageClient />;
 };
 
 export default SavedPage;

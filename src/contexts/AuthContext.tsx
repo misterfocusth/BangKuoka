@@ -6,6 +6,7 @@ import { db } from "@/app/config/firebaseConfig";
 import { collection, getDoc, getDocs } from "firebase/firestore";
 
 export type Session = {
+  id: string;
   first_name: String;
   last_name: String;
   dob: String;
@@ -17,6 +18,7 @@ export type Session = {
   profile_image_src?: String;
   address: String;
   credential_id?: String;
+  saved_events?: String[];
 };
 
 interface IAuthContext {
@@ -43,6 +45,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = useCallback(() => {
     const session: Session = {
+      id: "1",
       first_name: "Sila",
       last_name: "Pakdeewong",
       gender: "MALE",
@@ -53,6 +56,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         "School of Information Technology, KMITL, 1, Chalong Krung 1, Ladkrabang, Bangkok 10520",
       email: "sila.pak@outlook.com",
       interests: [],
+      saved_events: [],
     };
     localStorage.setItem("currentUser", JSON.stringify(session));
     return true;

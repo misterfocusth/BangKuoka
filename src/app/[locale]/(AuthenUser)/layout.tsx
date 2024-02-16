@@ -7,7 +7,6 @@ import React, { useContext } from "react";
 
 const AuthenUserLayout = ({ children }: { children: React.ReactNode }) => {
   const navbarContext = useContext(NavbarContext);
-  navbarContext.setNavbarTitle("BangKuoka");
 
   return (
     <div>

@@ -7,6 +7,8 @@ import { ConfigProvider } from "antd";
 import { NextIntlClientProvider, useMessages } from "next-intl";
 import NavbarContextProvider from "@/contexts/NavbarContext";
 
+import { Toaster } from "react-hot-toast";
+
 export default function RootLayout({
   children,
   params: { locale },
@@ -40,7 +42,10 @@ export default function RootLayout({
           >
             <NextIntlClientProvider locale={locale} messages={useMessages()}>
               <AuthContextProvider>
-                <NavbarContextProvider>{children}</NavbarContextProvider>
+                <NavbarContextProvider>
+                  <Toaster />
+                  {children}
+                </NavbarContextProvider>
               </AuthContextProvider>
             </NextIntlClientProvider>
           </ConfigProvider>

@@ -15,7 +15,7 @@ const initialState: INavbarContext = {
   setNavbarTitle: (title: String) => {},
   setShowLanguageSwitcherState: (val: boolean) => {},
   setShowNavbarState: (val: boolean) => {},
-  title: "",
+  title: "BangKuoka",
   isShowLanguageSwitcher: true,
   isShowNavbar: true,
 };
@@ -23,11 +23,17 @@ const initialState: INavbarContext = {
 export const NavbarContext = createContext<INavbarContext>(initialState);
 
 const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [title, setTitle] = useState<String>("Test");
+  const [title, setTitle] = useState<String>("BangKuoka");
   const [isShowLanguageSwitcher, setIsShowLanguageSwitcher] = useState<boolean>(true);
   const [isShowNavbar, setIsShowNavbar] = useState<boolean>(true);
 
-  const setNavbarTitle = (title: String) => setTitle(title);
+  const setNavbarTitle = (title: String) => {
+    if (title.length > 25) {
+      setTitle(title.substring(0, 25) + "...");
+    } else {
+      setTitle(title);
+    }
+  };
   const setShowLanguageSwitcherState = (val: boolean) => setIsShowLanguageSwitcher(val);
   const setShowNavbarState = (val: boolean) => setIsShowNavbar(val);
 
