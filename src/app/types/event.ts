@@ -6,7 +6,7 @@ export type Event = {
   event_image_src: string;
   category_id: number;
   description: string;
-  start_date: string;
+  start_date: Date;
   end_date: string;
   start_time: string;
   end_time: string;

@@ -20,9 +20,8 @@ const ReservationPageClient = () => {
   const authContext = useContext(AuthContext);
   const navbarContext = useContext(NavbarContext);
 
-  const [eventLocation, setEventLocation] = useState<String>("Bangkok");
-
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => console.log(info?.source, value);
+  const [eventLocation, setEventLocation] = useState<string>("");
+  const [currentTab, setCurrentTab] = useState("0");
 
   const onEventDateChange: DatePickerProps["onChange"] = (date, dateString) => {
     console.log(date, dateString);
@@ -34,6 +33,8 @@ const ReservationPageClient = () => {
   );
 
   const onTabChange = (key: string) => {
+    setEventLocation("");
+    setCurrentTab(key);
     setUserEventByStatus(
       RESERVATIONS.filter(
         (e) => e.user_id === authContext.currentUser?.id && e.status_id === Number(key)
@@ -61,14 +62,26 @@ const ReservationPageClient = () => {
           <div className="w-full">
             <div className="font-semibold text-sm">{t("location_label")}</div>
             <Select
-              defaultValue="TH"
+              defaultValue=""
               className="w-full h-10 mt-2"
               size="large"
-              onChange={setEventLocation}
+              onChange={(value: string) => {
+                if (value) {
+                  setUserEventByStatus(
+                    RESERVATIONS.filter(
+                      (e) =>
+                        e.user_id === authContext.currentUser?.id &&
+                        e.status_id === Number(currentTab) &&
+                        e.event?.country === value
+                    )
+                  );
+                }
+                setEventLocation(value);
+              }}
               value={eventLocation}
               options={[
-                { value: "Bangkok", label: "Bangkok" },
-                { value: "Fukuoka", label: "Fukuoka" },
+                { value: "BKK", label: "Bangkok" },
+                { value: "FK", label: "Fukuoka" },
               ]}
             />
           </div>

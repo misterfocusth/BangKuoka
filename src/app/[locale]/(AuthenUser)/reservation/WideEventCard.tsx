@@ -13,9 +13,9 @@ interface EventCardProps {
   eventName: string;
   description: string;
   categoryId: number;
-  reservedOn: Date;
-  ticketAmount: number;
-  statusId: number;
+  reservedOn?: Date;
+  ticketAmount?: number;
+  statusId?: number;
   eventLocation: string;
 }
 
@@ -79,7 +79,7 @@ const WideEventCard: React.FC<EventCardProps> = ({
             <div className="flex items-center gap-2 w-1/2">
               <CalendarDaysIcon />
               <div className="text-[#555555] text-sm">
-                {reservedOn.toLocaleDateString(undefined, {
+                {reservedOn?.toLocaleDateString(undefined, {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
@@ -88,26 +88,30 @@ const WideEventCard: React.FC<EventCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-6 mt-1">
-            <div className="flex items-center gap-2 w-1/2">
-              <Ticket />
-              <div className="text-[#555555] text-sm">
-                {`${ticketAmount} ${t("ticket_available_label")}`}
+          {ticketAmount || statusId ? (
+            <div className="flex items-center justify-between gap-6 mt-1">
+              <div className="flex items-center gap-2 w-1/2">
+                <Ticket />
+                <div className="text-[#555555] text-sm">
+                  {`${ticketAmount} ${t("ticket_available_label")}`}
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2 w-1/2">
-              <Info />
-              <div
-                className={`text-sm font-bold`}
-                style={{
-                  color: statusColor,
-                }}
-              >
-                {reserveStatus}
+              <div className="flex items-center gap-2 w-1/2">
+                <Info />
+                <div
+                  className={`text-sm font-bold`}
+                  style={{
+                    color: statusColor,
+                  }}
+                >
+                  {reserveStatus}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </div>

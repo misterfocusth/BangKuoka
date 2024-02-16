@@ -124,7 +124,10 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
         <div className="flex flex-col gap-2">
           <div className="font-semibold">{t("organized_by_label")}</div>
           <div className="text-wrap text-sm">{eventData.organizer.name}</div>
-          <div className="text-[#0068B2] font-semibold text-sm">
+          <div
+            className="text-[#0068B2] font-semibold text-sm"
+            onClick={() => router.push("/organizer/" + eventData.organizer_id)}
+          >
             {t("view_organizer_profile_label")}
           </div>
         </div>

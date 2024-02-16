@@ -9,7 +9,7 @@ export const EVENTS: Event[] = [
     category_id: 1,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    start_date: "16 Dec 2024",
+    start_date: new Date("2024-12-16 18:00:00"),
     end_date: "20 Dec 2024",
     start_time: "18.00",
     end_time: "20.00",
@@ -33,7 +33,7 @@ export const EVENTS: Event[] = [
     category_id: 2,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    start_date: "16 Dec 2024",
+    start_date: new Date("2024-12-16 18:00:00"),
     end_date: "20 Dec 2024",
     start_time: "18.00",
     end_time: "20.00",

@@ -56,7 +56,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
         "School of Information Technology, KMITL, 1, Chalong Krung 1, Ladkrabang, Bangkok 10520",
       email: "sila.pak@outlook.com",
       interests: [],
-      saved_events: [],
+      saved_events: ["1", "2"],
     };
     localStorage.setItem("currentUser", JSON.stringify(session));
     return true;
