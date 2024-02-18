@@ -63,7 +63,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("session");
+    localStorage.removeItem("currentUser");
     router.push("login");
     router.refresh();
   }, [router]);

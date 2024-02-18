@@ -4,14 +4,19 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { EVENTS } from "@/mock/events";
 import { useRouter } from "@/navigation";
 import { useTranslations } from "next-intl";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import WideEventCard from "../reservation/WideEventCard";
 import { Event } from "@/app/types/event";
+import { NavbarContext } from "@/contexts/NavbarContext";
 
 const SavedEventPageClient = () => {
   const { currentUser } = useContext(AuthContext);
-  const router = useRouter();
+  const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
+
+  useEffect(() => {
+    navbarContext.setNavbarTitle(t("saved_events_label"));
+  }, []);
 
   const userSavedEvents: Event[] = EVENTS.filter((e) => currentUser?.saved_events?.includes(e.id));
   console.log(currentUser?.saved_events?.includes("1"));
