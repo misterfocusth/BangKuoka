@@ -17,6 +17,9 @@ dependencies:
   dayjs:
     specifier: ^1.11.10
     version: 1.11.10
+  eruda:
+    specifier: ^3.0.1
+    version: 3.0.1
   firebase:
     specifier: ^10.8.0
     version: 10.8.0
@@ -3285,6 +3288,10 @@ packages:
     dependencies:
       graceful-fs: 4.2.11
       tapable: 2.2.1
+
+  /eruda@3.0.1:
+    resolution: {integrity: sha512-6q1Xdwga4JTr1mKSW4mzuWSSbmXgqpm/8Wa1QGFGfCWRjC0bCQjbS4u06M1te1moucIS3hBLlbSTPWYH2W0qbQ==}
+    dev: false
 
   /es-abstract@1.22.3:
     resolution: {integrity: sha512-eiiY8HQeYfYH2Con2berK+To6GrK2RxbPawDkGq4UiCQQfZHb6wX9qQqkbpPqaxQFcl8d9QzZqo0tGE0VcrdwA==}

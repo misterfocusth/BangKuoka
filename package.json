@@ -13,6 +13,7 @@
     "@ant-design/nextjs-registry": "^1.0.0",
     "antd": "^5.14.0",
     "dayjs": "^1.11.10",
+    "eruda": "^3.0.1",
     "firebase": "^10.8.0",
     "lucide-react": "^0.303.0",
     "next": "14.0.4",

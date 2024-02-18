@@ -3,11 +3,11 @@
 import BottomNavigation from "@/components/BottomNavigation";
 import Navbar from "@/components/Navbar";
 import NavbarContextProvider, { NavbarContext } from "@/contexts/NavbarContext";
+import eruda from "eruda";
 import React, { useContext } from "react";
 
 const AuthenUserLayout = ({ children }: { children: React.ReactNode }) => {
   const navbarContext = useContext(NavbarContext);
-
   return (
     <div>
       <Navbar

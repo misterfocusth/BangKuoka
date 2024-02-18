@@ -70,7 +70,8 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const session: Session = JSON.parse(localStorage.getItem("currentUser") || "{}");
-    if (session) setCurrentSession(session);
+    setCurrentSession(session);
+    alert(JSON.stringify(session));
   }, []);
 
   return (
