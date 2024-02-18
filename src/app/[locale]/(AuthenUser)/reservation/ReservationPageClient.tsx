@@ -56,7 +56,7 @@ const ReservationPageClient = () => {
 
   useEffect(() => {
     navbarContext.setNavbarTitle(t("my_reservations_label"));
-  }, [navbarContext]);
+  }, [navbarContext, t]);
 
   return (
     <div className="mb-32">

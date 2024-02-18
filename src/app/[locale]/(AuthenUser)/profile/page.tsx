@@ -24,7 +24,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     navbarContext.setNavbarTitle(t("my_profile_label"));
-  }, []);
+  }, [navbarContext, t]);
 
   return (
     <div>

@@ -7,7 +7,7 @@ import { NavbarContext } from "@/contexts/NavbarContext";
 import { EVENTS } from "@/mock/events";
 import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
-import { Avatar, Button, Card, DatePicker, DatePickerProps, Select, message } from "antd";
+import { Avatar, Button, Card, DatePicker, DatePickerProps, Empty, Select, message } from "antd";
 import Search, { SearchProps } from "antd/es/input/Search";
 import dayjs from "dayjs";
 import { MapPin, UserRound } from "lucide-react";
@@ -153,17 +153,21 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("local_events_subtitle")}</div>
 
       <div className="flex items-center gap-4">
-        {EVENTS.map((event) => (
-          <EventCard
-            key={event.id}
-            id={event.id}
-            eventImageSrc={event.event_image_src}
-            eventName={event.event_name}
-            description={event.description.substring(0, 50)}
-            startDate={event.start_date}
-            categoryId={event.category_id}
-          />
-        ))}
+        {EVENTS.length > 0 ? (
+          EVENTS.sort((a, b) => b.participant_num - a.participant_num).map((event) => (
+            <EventCard
+              key={event.id}
+              id={event.id}
+              eventImageSrc={event.event_image_src}
+              eventName={event.event_name}
+              description={event.description.substring(0, 50)}
+              startDate={event.start_date}
+              categoryId={event.category_id}
+            />
+          ))
+        ) : (
+          <Empty className="mt-6 mx-auto" />
+        )}
       </div>
 
       <div className="flex items-center justify-between mt-4">
@@ -181,17 +185,21 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("more_event_subtitle")}</div>
 
       <div className="flex items-center gap-4">
-        {EVENTS.map((event) => (
-          <EventCard
-            key={event.id}
-            id={event.id}
-            eventImageSrc={event.event_image_src}
-            eventName={event.event_name}
-            description={event.description.substring(0, 50)}
-            startDate={event.start_date}
-            categoryId={event.category_id}
-          />
-        ))}
+        {EVENTS.length > 0 ? (
+          EVENTS.sort((a, b) => b.start_date.getTime() - a.start_date.getTime()).map((event) => (
+            <EventCard
+              key={event.id}
+              id={event.id}
+              eventImageSrc={event.event_image_src}
+              eventName={event.event_name}
+              description={event.description.substring(0, 50)}
+              startDate={event.start_date}
+              categoryId={event.category_id}
+            />
+          ))
+        ) : (
+          <Empty className="mt-6 mx-auto" />
+        )}
       </div>
 
       <div className="flex items-center justify-between mt-4">
@@ -209,16 +217,20 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("event_organizers_subtitle")}</div>
 
       <div className="flex items-center gap-4">
-        {ORGANIZERS.map((organizer) => {
-          return (
-            <OrganizerCard
-              key={organizer.id}
-              id={organizer.id}
-              name={organizer.name}
-              imageSrc={organizer.icon_image_src}
-            />
-          );
-        })}
+        {ORGANIZERS.length > 0 ? (
+          ORGANIZERS.map((organizer) => {
+            return (
+              <OrganizerCard
+                key={organizer.id}
+                id={organizer.id}
+                name={organizer.name}
+                imageSrc={organizer.icon_image_src}
+              />
+            );
+          })
+        ) : (
+          <Empty className="mt-6 mx-auto" />
+        )}
       </div>
     </div>
   );

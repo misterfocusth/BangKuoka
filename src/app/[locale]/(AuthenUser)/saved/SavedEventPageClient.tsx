@@ -17,7 +17,7 @@ const SavedEventPageClient = () => {
 
   useEffect(() => {
     navbarContext.setNavbarTitle(t("saved_events_label"));
-  }, []);
+  }, [navbarContext, t]);
 
   const userSavedEvents: Event[] = EVENTS.filter((e) => currentUser?.saved_events?.includes(e.id));
 

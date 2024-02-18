@@ -28,8 +28,8 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isShowNavbar, setIsShowNavbar] = useState<boolean>(true);
 
   const setNavbarTitle = (title: String) => {
-    if (title.length > 25) {
-      setTitle(title.substring(0, 25) + "...");
+    if (title.length > 30) {
+      setTitle(title.substring(0, 30) + "...");
     } else {
       setTitle(title);
     }
