@@ -8,7 +8,7 @@ interface EventCardProps {
   eventImageSrc: string;
   eventName: string;
   description: string;
-  startDate: string;
+  startDate: Date;
   categoryId: number;
 }
 
@@ -36,7 +36,7 @@ const EventCard: React.FC<EventCardProps> = ({
       />
 
       <div className="p-2 flex flex-col gap-2">
-        <div className="text-[#555] text-sm">{startDate}</div>
+        <div className="text-[#555] text-sm">{startDate.toLocaleDateString()}</div>
         <div className="font-semibold mt-1 min-h-[6vh]">{eventName}</div>
         <div className="text-[#555] text-sm mb-1">{description}</div>
 

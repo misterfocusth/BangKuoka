@@ -33,12 +33,18 @@ const ReservationPageClient = () => {
   );
 
   const onTabChange = (key: string) => {
-    setEventLocation("");
     setCurrentTab(key);
     setUserEventByStatus(
-      RESERVATIONS.filter(
-        (e) => e.user_id === authContext.currentUser?.id && e.status_id === Number(key)
-      )
+      eventLocation
+        ? RESERVATIONS.filter(
+            (e) =>
+              e.user_id === authContext.currentUser?.id &&
+              e.status_id === Number(key) &&
+              e.event?.country === eventLocation
+          )
+        : RESERVATIONS.filter(
+            (e) => e.user_id === authContext.currentUser?.id && e.status_id === Number(key)
+          )
     );
   };
 
@@ -89,7 +95,7 @@ const ReservationPageClient = () => {
           <div className="w-full">
             <div className="font-semibold text-sm">{t("date_label")}</div>
             <DatePicker
-              defaultValue={dayjs("18 December 2003", dateFormat)}
+              // defaultValue={dayjs("18 December 2003", dateFormat)}
               format={dateFormat}
               className="w-full h-10 mt-2"
               onChange={onEventDateChange}

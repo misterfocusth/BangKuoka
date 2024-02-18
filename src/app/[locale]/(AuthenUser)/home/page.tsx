@@ -129,7 +129,7 @@ const HomePage = () => {
           <div className="w-full">
             <div className="font-semibold text-sm">{t("date_label")}</div>
             <DatePicker
-              defaultValue={dayjs("18 December 2003", dateFormat)}
+              // defaultValue={dayjs("18 December 2003", dateFormat)}
               format={dateFormat}
               className="w-full h-10 mt-2"
               onChange={onEventDateChange}
