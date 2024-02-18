@@ -2,7 +2,7 @@
 
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
-import { DatePicker, DatePickerProps, Select, Tabs, TabsProps } from "antd";
+import { DatePicker, DatePickerProps, Empty, Select, Tabs, TabsProps } from "antd";
 import { SearchProps } from "antd/es/input";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
@@ -113,20 +113,24 @@ const ReservationPageClient = () => {
       </div>
 
       <div>
-        {userEventByStatus.map((reservation) => (
-          <WideEventCard
-            key={reservation.id}
-            id={reservation.id}
-            eventImageSrc={reservation.event?.event_image_src || ""}
-            eventName={reservation.event?.event_name || ""}
-            description={reservation.event?.description || ""}
-            reservedOn={reservation.reserve_on}
-            ticketAmount={reservation.ticket_amount}
-            statusId={reservation.status_id}
-            categoryId={reservation.event?.category_id || 0}
-            eventLocation={reservation.event?.country || ""}
-          />
-        ))}
+        {userEventByStatus.length > 0 ? (
+          userEventByStatus.map((reservation) => (
+            <WideEventCard
+              key={reservation.id}
+              id={reservation.id}
+              eventImageSrc={reservation.event?.event_image_src || ""}
+              eventName={reservation.event?.event_name || ""}
+              description={reservation.event?.description || ""}
+              reservedOn={reservation.reserve_on}
+              ticketAmount={reservation.ticket_amount}
+              statusId={reservation.status_id}
+              categoryId={reservation.event?.category_id || 0}
+              eventLocation={reservation.event?.country || ""}
+            />
+          ))
+        ) : (
+          <Empty className="mt-12" />
+        )}
       </div>
     </div>
   );
