@@ -11,6 +11,7 @@ import { NavbarContext } from "@/contexts/NavbarContext";
 import { Empty } from "antd";
 
 const SavedEventPageClient = () => {
+  const router = useRouter();
   const { currentUser } = useContext(AuthContext);
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
@@ -37,6 +38,7 @@ const SavedEventPageClient = () => {
             categoryId={event.category_id || 0}
             eventLocation={event.country || ""}
             reservedOn={event.start_date}
+            onClick={() => router.push("/event/" + event.id)}
           />
         ))
       ) : (
