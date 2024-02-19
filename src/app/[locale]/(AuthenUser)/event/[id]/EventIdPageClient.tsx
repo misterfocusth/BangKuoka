@@ -86,7 +86,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
 
       <div
         className="w-full shadow border mt-6 rounded-xl p-4 flex items-center justify-between"
-        onClick={() => router.push("/event/" + eventData.id + "/transport")}
+        onClick={() => router.push("/event/" + eventData.id + "/transport", { scroll: true })}
       >
         <div className="flex flex-row items-center gap-1.5">
           <Bus />
@@ -108,7 +108,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
         className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center"
         size="large"
         type="primary"
-        onClick={() => router.push("/event/" + eventData.id + "/reservation")}
+        onClick={() => router.push("/event/" + eventData.id + "/reservation", { scroll: false })}
       >
         {t("make_reservation_button_label")}
       </Button>

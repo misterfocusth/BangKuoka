@@ -7,6 +7,7 @@ import { Avatar, Button } from "antd";
 import {
   BookMarked,
   CalendarCheck,
+  ImagePlus,
   Info,
   KeyRound,
   LogOut,
@@ -30,7 +31,7 @@ const ProfilePage = () => {
     <div>
       <div className="flex items-center gap-6">
         {authContext.currentUser?.profile_image_src ? (
-          <Avatar size={102} src={authContext.currentUser?.profile_image_src} />
+          <Avatar size={96} src={authContext.currentUser?.profile_image_src} />
         ) : (
           <Avatar size={96} icon={<User size={42} />} />
         )}
@@ -39,7 +40,7 @@ const ProfilePage = () => {
             {authContext.currentUser?.first_name + " " + authContext.currentUser?.last_name}
           </div>
           <div className="text-[#136912]">
-            {authContext.currentUser?.nationality === "Thai"
+            {authContext.currentUser?.nationality === "TH"
               ? t("bangkok_th_label")
               : t("fukuoka_jp_label")}
           </div>
@@ -47,12 +48,18 @@ const ProfilePage = () => {
       </div>
 
       <div className="mt-6 cursor-pointer  flex flex-col gap-4">
-        <div className="flex flex-row items-center gap-2 shadow p-6 rounded-xl active:bg-slate-100">
+        <div
+          className="flex flex-row items-center gap-2 shadow p-6 rounded-xl active:bg-slate-100"
+          onClick={() => router.push("/profile/edit")}
+        >
           <UserRoundCog />
           <div>{t("edit_profile_label")}</div>
         </div>
 
-        <div className="flex flex-row items-center gap-2 shadow p-6 rounded-xl active:bg-slate-100">
+        <div
+          className="flex flex-row items-center gap-2 shadow p-6 rounded-xl active:bg-slate-100"
+          onClick={() => router.push("/profile/change-password")}
+        >
           <KeyRound />
           <div>{t("change_password_label")}</div>
         </div>
