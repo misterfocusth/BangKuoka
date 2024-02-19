@@ -208,7 +208,7 @@ const HomePage = () => {
           type="text"
           className="text-[#136912]"
           onClick={() => {
-            router.push("/events");
+            router.push("/organizers");
           }}
         >
           {t("view_more_label")}

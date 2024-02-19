@@ -13,11 +13,6 @@ const AuthenUserLayout = ({ children }: { children: React.ReactNode }) => {
   const authContext = useContext(AuthContext);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authContext.currentUser?.id) router.replace("/login");
-  }),
-    [];
-
   return (
     <div>
       <Navbar

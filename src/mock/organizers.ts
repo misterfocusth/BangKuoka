@@ -22,7 +22,7 @@ export const ORGANIZERS: Organizer[] = [
     email: "bangkok@bangkok.go.th",
     phone_number: "+6665-652-6769",
     website: "https://www.bangkok.go.th",
-    country: "TH",
+    country: "JP",
     address:
       "Bangkok City Hall (Sao Chingcha) 73 Dinso Road , Phra Nakhon District Bangkok 10200, Thailand",
     description:
