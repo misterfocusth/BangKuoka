@@ -17,6 +17,7 @@ interface EventCardProps {
   ticketAmount?: number;
   statusId?: number;
   eventLocation: string;
+  onClick: () => void;
 }
 
 const WideEventCard: React.FC<EventCardProps> = ({
@@ -29,6 +30,7 @@ const WideEventCard: React.FC<EventCardProps> = ({
   ticketAmount,
   statusId,
   eventLocation,
+  onClick,
 }) => {
   const router = useRouter();
   const t = useTranslations("Index");
@@ -48,7 +50,7 @@ const WideEventCard: React.FC<EventCardProps> = ({
   }
 
   return (
-    <div>
+    <div onClick={onClick}>
       <div
         className="w-full shadow border mt-6 rounded-xl"
         onClick={() => router.push("/event/" + id)}

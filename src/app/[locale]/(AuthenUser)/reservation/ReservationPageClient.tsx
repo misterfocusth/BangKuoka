@@ -126,6 +126,7 @@ const ReservationPageClient = () => {
               statusId={reservation.status_id}
               categoryId={reservation.event?.category_id || 0}
               eventLocation={reservation.event?.country || ""}
+              onClick={() => router.push("/reservation/" + reservation.id)}
             />
           ))
         ) : (

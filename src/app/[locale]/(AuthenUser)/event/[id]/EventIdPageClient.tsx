@@ -20,6 +20,7 @@ import {
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React, { useContext } from "react";
+import toast from "react-hot-toast";
 
 interface EventIdPageClientProps {
   eventId: string;
@@ -35,6 +36,13 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
   const t = useTranslations("Index");
   const navbarContext = useContext(NavbarContext);
   navbarContext.setNavbarTitle(eventData.event_name);
+
+  const handleMakeReservation = () => {
+    if (confirm()) {
+      toast.success("Make reservation complete.");
+      router.push("/reservation/" + "1");
+    }
+  };
 
   return (
     <div className="mb-20">
@@ -54,7 +62,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
         </div>
       </div>
 
-      <div className="mt-4 text-lg font-bold">{eventData.event_name}</div>
+      <div className="mt-6 text-lg font-bold">{eventData.event_name}</div>
 
       <div className="w-full shadow border mt-6 rounded-xl p-4 flex flex-col gap-4">
         <div className="flex items-start gap-3">
@@ -108,7 +116,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
         className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center"
         size="large"
         type="primary"
-        onClick={() => router.push("/event/" + eventData.id + "/reservation", { scroll: false })}
+        onClick={handleMakeReservation}
       >
         {t("make_reservation_button_label")}
       </Button>
