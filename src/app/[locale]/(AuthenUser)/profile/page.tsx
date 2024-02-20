@@ -80,7 +80,10 @@ const ProfilePage = () => {
           <div>{t("my_reservation_title")}</div>
         </div>
 
-        <div className="flex flex-row items-center gap-2 shadow p-6 rounded-xl active:bg-slate-100">
+        <div
+          className="flex flex-row items-center gap-2 shadow p-6 rounded-xl active:bg-slate-100"
+          onClick={() => router.push("/tourist")}
+        >
           <Info />
           <div>{t("tourist_info_label")}</div>
         </div>
