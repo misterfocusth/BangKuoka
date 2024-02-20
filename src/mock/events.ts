@@ -29,7 +29,7 @@ export const EVENTS: Event[] = [
     id: "2",
     event_name: "Star Wars A new Hope In Concert”",
     event_image_src: "https://picsum.photos/1920/1080?random=2",
-    category_id: 2,
+    category_id: 3,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     start_date: new Date("2024-04-30 16:00:00"),
@@ -76,7 +76,7 @@ export const EVENTS: Event[] = [
     id: "4",
     event_name: "Stardew Valley Festival of Seasons”",
     event_image_src: "https://picsum.photos/1920/1080?random=4",
-    category_id: 2,
+    category_id: 5,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     start_date: new Date("2024-04-22 19:30:00"),
