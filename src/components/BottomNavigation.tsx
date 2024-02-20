@@ -34,7 +34,7 @@ const BottomNavigation = () => {
             <p className="m-0 text-[#136912]">Home</p>
           </div>
         ) : (
-          <Home />
+          <Home className="active:bg-slate-100" />
         )}
       </div>
 
@@ -45,7 +45,7 @@ const BottomNavigation = () => {
             <p className="m-0 text-[#136912]">Reservation</p>
           </div>
         ) : (
-          <CalendarCheck />
+          <CalendarCheck className="active:bg-slate-100" />
         )}
       </div>
 
@@ -56,7 +56,7 @@ const BottomNavigation = () => {
             <p className="m-0 text-[#136912]">Saved</p>
           </div>
         ) : (
-          <BookMarked />
+          <BookMarked className="active:bg-slate-100" />
         )}
       </div>
 
@@ -67,7 +67,7 @@ const BottomNavigation = () => {
             <p className="m-0 text-[#136912]">Profile</p>
           </div>
         ) : (
-          <UserRound />
+          <UserRound className="active:bg-slate-100" />
         )}
       </div>
     </div>

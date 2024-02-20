@@ -87,7 +87,7 @@ const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizer }) =>
             <div>
               <div className="text-[#0068B2] font-semibold">{t("website_label")}</div>
               <div
-                className="mt-1 text-sm underline"
+                className="mt-1 text-sm underline active:bg-slate-100 rounded-xl"
                 onClick={() => {
                   window.open(organizer.website, "_blank", "noreferrer");
                 }}

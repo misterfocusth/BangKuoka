@@ -27,7 +27,7 @@ const PublicTransportationPageClient = () => {
         <GoogleMap address={event.loc_name} />
       </div>
       <div
-        className="flex flex-row items-center justify-center w-full text-[#0068B2] gap-2 mt-6"
+        className="flex flex-row items-center justify-center w-full text-[#0068B2] gap-2 mt-6 active:bg-slate-100 rounded-xl"
         onClick={() => {
           window.open(
             `https://www.google.com/maps/search/${event.loc_name}`,

@@ -123,7 +123,7 @@ const ReservationIdPageClient: React.FC<ReservationIdPageClientProps> = ({ reser
       <div className="text-wrap leading-relaxed mt-6">{reservation.event?.description}</div>
 
       <div
-        className="w-full shadow border mt-6 rounded-xl p-4 flex items-center justify-between"
+        className="w-full shadow border mt-6 rounded-xl p-4 flex items-center justify-between active:bg-slate-100"
         onClick={() =>
           router.push("/event/" + reservation.event?.id + "/transport", { scroll: true })
         }
@@ -154,7 +154,7 @@ const ReservationIdPageClient: React.FC<ReservationIdPageClientProps> = ({ reser
           <div className="font-semibold">{t("organized_by_label")}</div>
           <div className="text-wrap text-sm">{reservation.event?.organizer.name}</div>
           <div
-            className="text-[#0068B2] font-semibold text-sm"
+            className="text-[#0068B2] font-semibold text-sm active:bg-slate-100 rounded-xl"
             onClick={() => router.push("/organizer/" + reservation.event?.organizer_id)}
           >
             {t("view_organizer_profile_label")}

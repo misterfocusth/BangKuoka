@@ -48,7 +48,7 @@ const LandingOnePage = () => {
               router.push("/home");
             }}
           >
-            skip for now
+            Skip for now
           </Button>
         </div>
       </div>

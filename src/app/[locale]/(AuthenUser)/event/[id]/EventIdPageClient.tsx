@@ -93,7 +93,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
       </div>
 
       <div
-        className="w-full shadow border mt-6 rounded-xl p-4 flex items-center justify-between"
+        className="w-full shadow border mt-6 rounded-xl p-4 flex items-center justify-between active:bg-slate-100"
         onClick={() => router.push("/event/" + eventData.id + "/transport", { scroll: true })}
       >
         <div className="flex flex-row items-center gap-1.5">
@@ -133,7 +133,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
           <div className="font-semibold">{t("organized_by_label")}</div>
           <div className="text-wrap text-sm">{eventData.organizer.name}</div>
           <div
-            className="text-[#0068B2] font-semibold text-sm"
+            className="text-[#0068B2] font-semibold text-sm active:bg-slate-100 rounded-xl"
             onClick={() => router.push("/organizer/" + eventData.organizer_id)}
           >
             {t("view_organizer_profile_label")}

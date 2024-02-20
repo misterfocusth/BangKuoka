@@ -142,7 +142,7 @@ const HomePage = () => {
         <div className="text-lg font-bold">{t("popular_events_label")}</div>
         <Button
           type="text"
-          className="text-[#136912]"
+          className="text-[#136912] active:bg-slate-100"
           onClick={() => {
             router.push("/events");
           }}
@@ -174,7 +174,7 @@ const HomePage = () => {
         <div className="text-lg font-bold">{t("more_event_label")}</div>
         <Button
           type="text"
-          className="text-[#136912]"
+          className="text-[#136912] active:bg-slate-100"
           onClick={() => {
             router.push("/events");
           }}
@@ -206,7 +206,7 @@ const HomePage = () => {
         <div className="text-lg font-bold">{t("event_organizers_label")}</div>
         <Button
           type="text"
-          className="text-[#136912]"
+          className="text-[#136912] active:bg-slate-100"
           onClick={() => {
             router.push("/organizers");
           }}
