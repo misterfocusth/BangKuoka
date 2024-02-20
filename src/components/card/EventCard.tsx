@@ -41,8 +41,10 @@ const EventCard: React.FC<EventCardProps> = ({
           <CalendarDays size={14} />
           {startDate.toLocaleDateString()}
         </div>
-        <div className="font-semibold mt-1 min-h-[6vh] max-h-[6vh] text-pretty">{eventName}</div>
-        <div className="text-[#555] text-sm mb-1 max-h-[7vh] min-h-[7vh] text-pretty">
+        <div className="font-semibold mt-1 min-h-[6vh] max-h-[6vh]">
+          {eventName.length > 30 ? eventName.substring(0, 30) + "..." : eventName}
+        </div>
+        <div className="text-[#555] text-sm mb-1 mt-1 max-h-[7vh] min-h-[7vh] text-pretty">
           {description}
         </div>
 

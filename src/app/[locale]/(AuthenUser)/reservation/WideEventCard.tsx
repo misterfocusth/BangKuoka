@@ -71,19 +71,27 @@ const WideEventCard: React.FC<EventCardProps> = ({
           <div className="text-[#555] text-sm mb-1">{description.substring(0, 100)}</div>
 
           <div className="flex items-center justify-between gap-6 mt-1">
-            <div className="flex items-center gap-2 w-1/2">
+            <div
+              className={
+                "flex items-center gap-2 " + (ticketAmount || statusId ? "w-3/5" : "w-1/2")
+              }
+            >
               <MapPin />
               <div className="text-[#555555] text-sm">
                 {eventLocation === "BKK" ? t("bangkok_th_label") : t("fukuoka_jp_label")}
               </div>
             </div>
 
-            <div className="flex items-center gap-2 w-1/2">
+            <div
+              className={
+                "flex items-center gap-2 w-2/5 " + (ticketAmount || statusId ? "w-3/5" : "w-1/2")
+              }
+            >
               <CalendarDaysIcon />
               <div className="text-[#555555] text-sm">
                 {reservedOn?.toLocaleDateString(undefined, {
                   day: "numeric",
-                  month: "long",
+                  month: "short",
                   year: "numeric",
                 })}
               </div>
