@@ -1,5 +1,6 @@
 "use client";
 
+import { Event } from "@/app/types/event";
 import EventCard from "@/components/card/EventCard";
 import OrganizerCard from "@/components/card/OrganizerCard";
 import { AuthContext } from "@/contexts/AuthContext";
@@ -24,9 +25,22 @@ const HomePage = () => {
 
   const navbarContext = useContext(NavbarContext);
 
-  const [eventLocation, setEventLocation] = useState<String>("Bangkok");
+  const [eventLocation, setEventLocation] = useState<String>("All");
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>(EVENTS);
+  const [searchValue, setSearchValue] = useState("");
 
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => console.log(info?.source, value);
+  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
+    console.log(info?.source, value);
+    setSearchValue(value);
+    const location = eventLocation === "Bangkok" ? "BKK" : "FK";
+    if (!value && eventLocation === "All") {
+      setFilteredEvents(EVENTS);
+    } else {
+      setFilteredEvents((prev) =>
+        prev.filter((e) => e.event_name.includes(value) && e.country === location)
+      );
+    }
+  };
 
   const onEventDateChange: DatePickerProps["onChange"] = (date, dateString) => {
     console.log(date, dateString);
@@ -117,9 +131,24 @@ const HomePage = () => {
               defaultValue="TH"
               className="w-full h-10 mt-2"
               size="large"
-              onChange={setEventLocation}
+              onChange={(value) => {
+                setEventLocation(value);
+                const location = value === "Bangkok" ? "BKK" : "FK";
+                if (value === "All" && !searchValue) {
+                  return setFilteredEvents(EVENTS);
+                } else if (value && !searchValue) {
+                  return setFilteredEvents(EVENTS.filter((e) => e.country === location));
+                } else {
+                  return setFilteredEvents(
+                    EVENTS.filter(
+                      (e) => e.country === location && e.event_name.includes(searchValue)
+                    )
+                  );
+                }
+              }}
               value={eventLocation}
               options={[
+                { value: "All", label: "Show all events" },
                 { value: "Bangkok", label: "Bangkok" },
                 { value: "Fukuoka", label: "Fukuoka" },
               ]}
@@ -140,7 +169,7 @@ const HomePage = () => {
 
       <div className="flex items-center justify-between mt-4">
         <div className="text-lg font-bold">{t("popular_events_label")}</div>
-        <Button
+        {/* <Button
           type="text"
           className="text-[#136912] active:bg-slate-100"
           onClick={() => {
@@ -148,23 +177,25 @@ const HomePage = () => {
           }}
         >
           {t("view_more_label")}
-        </Button>
+        </Button> */}
       </div>
       <div className="text-[#555555] mt-1">{t("local_events_subtitle")}</div>
 
       <div className="grid grid-cols-2 gap-4">
-        {EVENTS.length > 0 ? (
-          EVENTS.sort((a, b) => b.participant_num - a.participant_num).map((event) => (
-            <EventCard
-              key={event.id}
-              id={event.id}
-              eventImageSrc={event.event_image_src}
-              eventName={event.event_name}
-              description={event.description.substring(0, 50)}
-              startDate={event.start_date}
-              categoryId={event.category_id}
-            />
-          ))
+        {filteredEvents.length > 0 ? (
+          filteredEvents
+            .sort((a, b) => b.participant_num - a.participant_num)
+            .map((event) => (
+              <EventCard
+                key={event.id}
+                id={event.id}
+                eventImageSrc={event.event_image_src}
+                eventName={event.event_name}
+                description={event.description.substring(0, 50)}
+                startDate={event.start_date}
+                categoryId={event.category_id}
+              />
+            ))
         ) : (
           <Empty className="mt-6 mx-auto" />
         )}
@@ -172,31 +203,34 @@ const HomePage = () => {
 
       <div className="flex items-center justify-between mt-4">
         <div className="text-lg font-bold">{t("more_event_label")}</div>
-        <Button
+        {/* <Button
           type="text"
           className="text-[#136912] active:bg-slate-100"
           onClick={() => {
             router.push("/events");
           }}
+          disabled
         >
           {t("view_more_label")}
-        </Button>
+        </Button> */}
       </div>
       <div className="text-[#555555] mt-1">{t("more_event_subtitle")}</div>
 
       <div className="grid grid-cols-2 gap-4">
-        {EVENTS.length > 0 ? (
-          EVENTS.sort((a, b) => b.start_date.getTime() - a.start_date.getTime()).map((event) => (
-            <EventCard
-              key={event.id}
-              id={event.id}
-              eventImageSrc={event.event_image_src}
-              eventName={event.event_name}
-              description={event.description.substring(0, 50)}
-              startDate={event.start_date}
-              categoryId={event.category_id}
-            />
-          ))
+        {filteredEvents.length > 0 ? (
+          filteredEvents
+            .sort((a, b) => b.start_date.getTime() - a.start_date.getTime())
+            .map((event) => (
+              <EventCard
+                key={event.id}
+                id={event.id}
+                eventImageSrc={event.event_image_src}
+                eventName={event.event_name}
+                description={event.description.substring(0, 50)}
+                startDate={event.start_date}
+                categoryId={event.category_id}
+              />
+            ))
         ) : (
           <Empty className="mt-6 mx-auto" />
         )}
