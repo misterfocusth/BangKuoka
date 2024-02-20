@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 import EventCategoryChip from "../chip/EventCategoryChip";
 import { useRouter } from "@/navigation";
+import { CalendarDays } from "lucide-react";
 
 interface EventCardProps {
   id: string;
@@ -32,11 +33,14 @@ const EventCard: React.FC<EventCardProps> = ({
         width={1920}
         height={1080}
         alt="event image"
-        className="w-full h-full rounded-t-xl"
+        className=" h-28 w-full  rounded-t-xl"
       />
 
       <div className="p-2 flex flex-col gap-2">
-        <div className="text-[#555] text-sm">{startDate.toLocaleDateString()}</div>
+        <div className="text-[#555] text-sm flex items-center gap-1">
+          <CalendarDays size={14} />
+          {startDate.toLocaleDateString()}
+        </div>
         <div className="font-semibold mt-1 min-h-[6vh]">{eventName}</div>
         <div className="text-[#555] text-sm mb-1">{description}</div>
 

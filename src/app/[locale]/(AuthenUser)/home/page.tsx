@@ -152,7 +152,7 @@ const HomePage = () => {
       </div>
       <div className="text-[#555555] mt-1">{t("local_events_subtitle")}</div>
 
-      <div className="flex items-center gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {EVENTS.length > 0 ? (
           EVENTS.sort((a, b) => b.participant_num - a.participant_num).map((event) => (
             <EventCard
@@ -184,7 +184,7 @@ const HomePage = () => {
       </div>
       <div className="text-[#555555] mt-1">{t("more_event_subtitle")}</div>
 
-      <div className="flex items-center gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {EVENTS.length > 0 ? (
           EVENTS.sort((a, b) => b.start_date.getTime() - a.start_date.getTime()).map((event) => (
             <EventCard
@@ -216,7 +216,7 @@ const HomePage = () => {
       </div>
       <div className="text-[#555555] mt-1">{t("event_organizers_subtitle")}</div>
 
-      <div className="flex items-center gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {ORGANIZERS.length > 0 ? (
           ORGANIZERS.map((organizer) => {
             return (

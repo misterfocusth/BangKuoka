@@ -2,8 +2,6 @@
 
 import { useRouter } from "@/navigation";
 import { useCallback, useEffect, useState, createContext } from "react";
-import { db } from "@/app/config/firebaseConfig";
-import { collection, getDoc, getDocs } from "firebase/firestore";
 
 export type Session = {
   id: string;
@@ -57,12 +55,13 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       first_name: "Sila",
       last_name: "Pakdeewong",
       gender: "MALE",
-      dob: "20 December 2003",
+      dob: "18 December 2003",
       nationality: "TH",
-      phone_number: "+6665-652-6769",
+      phone_number: "+6694-819-5617",
+      profile_image_src: "https://avatars.githubusercontent.com/u/53871704?v=4",
       address:
         "School of Information Technology, KMITL, 1, Chalong Krung 1, Ladkrabang, Bangkok 10520",
-      email: "sila.pak@outlook.com",
+      email: "sila.pak@xxxxx.com",
       interests: [],
       password: "",
       saved_events: ["1", "2"],
