@@ -3,6 +3,7 @@
 import { Breadcrumb, ConfigProvider, Layout, Menu, MenuProps, theme } from "antd";
 import {
   CalendarOutlined,
+  EditFilled,
   HomeOutlined,
   KeyOutlined,
   LaptopOutlined,
@@ -91,7 +92,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                   key: "2",
                   icon: <CalendarOutlined />,
                   label: "Calendar",
-                  onClick: () => router.push("/dashboard"),
+                  onClick: () => router.push("/organizer/calendar"),
                 },
                 {
                   key: "3",
@@ -101,9 +102,15 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 },
                 {
                   key: "4",
+                  icon: <EditFilled />,
+                  label: "Edit Profile",
+                  onClick: () => router.push("/organizer/profile/edit"),
+                },
+                {
+                  key: "5",
                   icon: <KeyOutlined />,
                   label: "Credential",
-                  onClick: () => router.push("/dashboard"),
+                  onClick: () => router.push("/organizer/credential"),
                 },
               ]}
             />

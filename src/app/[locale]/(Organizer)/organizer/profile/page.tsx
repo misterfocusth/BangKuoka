@@ -3,8 +3,19 @@
 import { Organizer } from "@/app/types/organizer";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useRouter } from "@/navigation";
-import { Avatar, Button, GetProp, Upload, UploadProps } from "antd";
-import { Edit, ImagePlus, Map, MapPin, UserIcon } from "lucide-react";
+import { Avatar, Button, GetProp, Statistic, Upload, UploadProps } from "antd";
+import {
+  AreaChart,
+  CheckCircle2,
+  CircleUser,
+  Edit,
+  Eye,
+  ImagePlus,
+  LibraryBig,
+  Map,
+  MapPin,
+  UserIcon,
+} from "lucide-react";
 import React, { useContext, useState } from "react";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
@@ -74,6 +85,32 @@ const OrganizerProfilePage = () => {
             <Edit size={16} />
             Edit Organizer Profile
           </Button>
+        </div>
+      </div>
+
+      <div className="mt-6 flex flex-row items-center gap-2 text-xl font-bold text-[#0068B2]">
+        <AreaChart />
+        Stats for organizers and events.
+      </div>
+      <div className="grid items-center grid-cols-5 gap-6 mt-2">
+        <div className="p-6 rounded-xl shadow">
+          <Statistic prefix={<LibraryBig size={20} />} title="Your Events" value={112893} />
+        </div>
+        <div className="p-6 rounded-xl shadow">
+          <Statistic
+            prefix={<CheckCircle2 size={20} />}
+            title="Event's Participants"
+            value={112893}
+          />
+        </div>
+        <div className="p-6 rounded-xl shadow">
+          <Statistic prefix={<Eye size={20} />} title="Total Event's Views" value={112893} />
+        </div>
+        <div className="p-6 rounded-xl shadow">
+          <Statistic prefix={<CircleUser size={20} />} title="Local Organizers" value={112893} />
+        </div>
+        <div className="p-6 rounded-xl shadow">
+          <Statistic prefix={<CircleUser size={20} />} title="Intl. Organizers" value={112893} />
         </div>
       </div>
 
