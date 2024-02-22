@@ -84,7 +84,12 @@ const OrganizerPage = () => {
 
           <div className="mt-6 text-white">
             {t("dont_have_account_label")}{" "}
-            <span className=" underline font-semibold cursor-pointer text-white">
+            <span
+              className=" underline font-semibold cursor-pointer text-white"
+              onClick={() => {
+                router.push("/organizer/register");
+              }}
+            >
               {t("register_new_account_label")}
             </span>
           </div>

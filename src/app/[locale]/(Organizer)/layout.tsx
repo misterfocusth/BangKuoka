@@ -19,31 +19,6 @@ import OrganizerProfileDropdown from "@/components/OrganizerProfileDropdown";
 
 const { Header, Content, Sider } = Layout;
 
-const items1: MenuProps["items"] = ["Home", "Event", "Calendar", "Profile"].map((key) => ({
-  key,
-  label: `nav ${key}`,
-}));
-
-const items2: MenuProps["items"] = [UserOutlined, LaptopOutlined, NotificationOutlined].map(
-  (icon, index) => {
-    const key = String(index + 1);
-
-    return {
-      key: `sub${key}`,
-      icon: React.createElement(icon),
-      label: `subnav ${key}`,
-
-      // children: new Array(4).fill(null).map((_, j) => {
-      //   const subKey = index * 4 + j + 1;
-      //   return {
-      //     key: subKey,
-      //     label: `option${subKey}`,
-      //   };
-      // }),
-    };
-  }
-);
-
 const AdminLayout = ({ children }: { children: ReactNode }) => {
   const t = useTranslations("Index");
   const router = useRouter();
@@ -96,24 +71,18 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
             items={[
               {
                 key: "1",
-                icon: <HomeOutlined />,
-                label: "Home",
-                onClick: () => router.push("/organizer/dashboard"),
+                icon: <SettingOutlined />,
+                label: "Event",
+                onClick: () => router.push("/organizer/events"),
               },
               {
                 key: "2",
-                icon: <SettingOutlined />,
-                label: "Event",
-                onClick: () => router.push("/dashboard"),
-              },
-              {
-                key: "3",
                 icon: <CalendarOutlined />,
                 label: "Calendar",
                 onClick: () => router.push("/dashboard"),
               },
               {
-                key: "4",
+                key: "3",
                 icon: <UserOutlined />,
                 label: "Profile",
                 onClick: () => router.push("/dashboard"),

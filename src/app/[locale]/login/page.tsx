@@ -30,7 +30,7 @@ const LoginPage = () => {
   const t = useTranslations("Index");
 
   const handleLogin = () => {
-    const isLoggedIn = authContenxt.login();
+    const isLoggedIn = authContenxt.login("USER");
 
     if (isLoggedIn) {
       router.push("/home");
