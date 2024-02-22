@@ -135,7 +135,7 @@ const OrganizerRegisterPage = () => {
             </div>
 
             <div className="mt-8 w-[90%]">
-              <p className="m-0 ml-1 mb-3 font-semibold">{"Website"}</p>
+              <p className="m-0 ml-1 mb-3 font-semibold">{"Email"}</p>
               <Input
                 className="h-12"
                 size="large"
