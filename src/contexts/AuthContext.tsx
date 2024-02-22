@@ -1,28 +1,12 @@
 "use client";
 
 import { Organizer } from "@/app/types/organizer";
+import { User } from "@/app/types/user";
 import { useRouter } from "@/navigation";
 import { useCallback, useEffect, useState, createContext } from "react";
 
-export type Session = {
-  id: string;
-  first_name: string;
-  last_name: string;
-  dob: string;
-  gender: "MALE" | "FEMALE";
-  nationality: "TH" | "JP";
-  phone_number: string;
-  email: string;
-  interests?: string[];
-  profile_image_src?: string;
-  address: string;
-  credential_id?: string;
-  saved_events?: string[];
-  password: string;
-};
-
 interface IAuthContext {
-  currentUser: Session | Organizer | null;
+  currentUser: User | Organizer | null;
   login: () => boolean;
   logout: () => void;
 }
@@ -41,17 +25,17 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentSession] = useState<Session | null>(null);
+  const [currentUser, setCurrentSession] = useState<User | Organizer | null>(null);
 
   const getUserSession = useCallback(() => {
     if (localStorage.getItem("currentUser")) {
-      const session: Session = JSON.parse(localStorage.getItem("currentUser") || "");
+      const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
       setCurrentSession(session);
     }
   }, []);
 
   const login = useCallback(() => {
-    const session: Session = {
+    const session: User = {
       id: "1",
       first_name: "Sila",
       last_name: "Pakdeewong",
@@ -67,6 +51,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       password: "",
       saved_events: ["1", "2"],
     };
+
     localStorage.setItem("currentUser", JSON.stringify(session));
     setCurrentSession(session);
     return true;

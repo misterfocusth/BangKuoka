@@ -1,8 +1,8 @@
 import { Reservation } from "@/app/types/reservation";
-import { Session } from "@/contexts/AuthContext";
 import { EVENTS } from "./events";
+import { User } from "@/app/types/user";
 
-const currentUser: Session = {
+const currentUser: User = {
   id: "1",
   first_name: "Sila",
   last_name: "Pakdeewong",

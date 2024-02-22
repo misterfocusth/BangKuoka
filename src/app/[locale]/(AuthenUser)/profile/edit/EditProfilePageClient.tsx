@@ -19,11 +19,12 @@ import {
 import Password from "antd/es/input/Password";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
-import { Edit, FileType, ImagePlus, KeyRound, Mail, Phone, User } from "lucide-react";
+import { Edit, FileType, ImagePlus, KeyRound, Mail, Phone, User as UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useContext, useEffect, useState } from "react";
 import { Group } from "antd/es/radio";
 import toast from "react-hot-toast";
+import { User } from "@/app/types/user";
 
 const dateFormat = "DD MMMM YYYY";
 
@@ -48,7 +49,8 @@ const beforeUpload = (file: FileType) => {
 };
 
 const EditProfilePageClient = () => {
-  const { currentUser } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const currentUser = authContext.currentUser as User;
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
 
@@ -145,14 +147,14 @@ const EditProfilePageClient = () => {
           >
             {imageUrl ? (
               <div className="relative">
-                <Avatar size={102} icon={<User size={42} />} src={imageUrl} />
+                <Avatar size={102} icon={<UserIcon size={42} />} src={imageUrl} />
                 <div className=" absolute right-0 bottom-0 rounded-full bg-[#136912] flex items-center justify-center p-2">
                   <Edit size={16} color="#fff" className="p-0 m-auto" />
                 </div>
               </div>
             ) : (
               <div className="relative">
-                <Avatar size={102} icon={<User size={42} />} />
+                <Avatar size={102} icon={<UserIcon size={42} />} />
                 <div className=" absolute right-0 bottom-0 rounded-full bg-[#136912] flex items-center justify-center p-2">
                   <ImagePlus size={16} color="#fff" className="p-0 m-auto" />
                 </div>
