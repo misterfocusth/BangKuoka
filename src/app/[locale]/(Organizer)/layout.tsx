@@ -98,7 +98,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
                 key: "1",
                 icon: <HomeOutlined />,
                 label: "Home",
-                onClick: () => router.push("/dashboard"),
+                onClick: () => router.push("/organizer/dashboard"),
               },
               {
                 key: "2",

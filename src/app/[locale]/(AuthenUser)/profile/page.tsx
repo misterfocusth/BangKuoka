@@ -97,7 +97,7 @@ const ProfilePage = () => {
         className="flex items-center w-full justify-center mt-6"
         icon={<LogOut size={18} />}
         onClick={() => {
-          logout();
+          logout("USER");
         }}
       >
         {t("logout_label")}

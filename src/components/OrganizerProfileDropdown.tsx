@@ -1,6 +1,7 @@
+import { AuthContext } from "@/contexts/AuthContext";
 import { useRouter } from "@/navigation";
 import { Button, ConfigProvider, Dropdown, MenuProps } from "antd";
-import { FC } from "react";
+import { FC, useContext } from "react";
 
 interface OrganizerProfileDropdownProps {
   profile_image_src?: string;
@@ -15,9 +16,10 @@ const items: MenuProps["items"] = [
 
 const OrganizerProfileDropdown: FC<OrganizerProfileDropdownProps> = () => {
   const router = useRouter();
+  const authContext = useContext(AuthContext);
   const handleChangeLanguage: MenuProps["onClick"] = ({ key }) => {
     if (key === "logout") {
-      router.replace("/organizer");
+      authContext.logout("ORGANIZER");
     }
   };
 

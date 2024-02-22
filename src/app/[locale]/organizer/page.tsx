@@ -1,16 +1,35 @@
 "use client";
 
+import { Organizer } from "@/app/types/organizer";
+import { AuthContext } from "@/contexts/AuthContext";
 import { useRouter } from "@/navigation";
 import { Button, Input } from "antd";
 import Password from "antd/es/input/Password";
 import { KeyRound, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 const OrganizerPage = () => {
   const t = useTranslations("Index");
+  const authContext = useContext(AuthContext);
   const router = useRouter();
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const currentUser = authContext.currentUser as Organizer;
+    console.log(currentUser);
+    if (currentUser && currentUser.name) {
+      router.replace("/organizer/dashboard");
+    } else {
+      setIsLoading(false);
+    }
+  }, [authContext.currentUser, router]);
+
+  if (isLoading) {
+    return <></>;
+  }
 
   return (
     <div className="min-h-screen bg-[#0068B2] grid grid-cols-2">
@@ -52,7 +71,13 @@ const OrganizerPage = () => {
           <Button
             size="large"
             className="w-full font-bold mt-12 p-6 flex flex-row items-center justify-center"
-            onClick={() => router.replace("/organizer/dashboard")}
+            onClick={() => {
+              if (authContext.login("ORGANIZER")) {
+                router.replace("/organizer/dashboard");
+              } else {
+                alert("Incorrect Credentials.");
+              }
+            }}
           >
             {t("login_title")}
           </Button>

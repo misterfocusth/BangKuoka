@@ -12,7 +12,7 @@ export const ORGANIZERS: Organizer[] = [
       "Bangkok City Hall (Sao Chingcha) 73 Dinso Road , Phra Nakhon District Bangkok 10200, Thailand",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-    credential_id: null,
+    password: "",
     event: ["1"],
     icon_image_src: "/images/organizers/bkk.png",
   },
@@ -27,7 +27,7 @@ export const ORGANIZERS: Organizer[] = [
       "Bangkok City Hall (Sao Chingcha) 73 Dinso Road , Phra Nakhon District Bangkok 10200, Thailand",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.",
-    credential_id: null,
+    password: "",
     event: ["2"],
     icon_image_src: "/images/organizers/fk.png",
   },

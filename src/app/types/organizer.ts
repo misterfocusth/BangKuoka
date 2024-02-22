@@ -7,7 +7,7 @@ export type Organizer = {
   country: "TH" | "JP";
   address: string;
   description: string;
-  credential_id: string | null;
+  password: string | null;
   event: string[];
   icon_image_src: string;
 };

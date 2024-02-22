@@ -2,21 +2,24 @@
 
 import { Organizer } from "@/app/types/organizer";
 import { User } from "@/app/types/user";
+import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
 import { useCallback, useEffect, useState, createContext } from "react";
 
+type UserType = "ORGANIZER" | "USER";
+
 interface IAuthContext {
   currentUser: User | Organizer | null;
-  login: () => boolean;
-  logout: () => void;
+  login: (userType: UserType) => boolean;
+  logout: (userType: UserType) => void;
 }
 
 const initialState: IAuthContext = {
   currentUser: null,
-  login: () => {
+  login: (userType?: UserType) => {
     return true;
   },
-  logout: () => {},
+  logout: (userType?: UserType) => {},
 };
 
 export const AuthContext = createContext<IAuthContext>(initialState);
@@ -27,14 +30,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentSession] = useState<User | Organizer | null>(null);
 
-  const getUserSession = useCallback(() => {
-    if (localStorage.getItem("currentUser")) {
-      const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
-      setCurrentSession(session);
-    }
-  }, []);
-
-  const login = useCallback(() => {
+  const login = useCallback((userType: UserType = "USER") => {
     const session: User = {
       id: "1",
       first_name: "Sila",
@@ -52,20 +48,37 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       saved_events: ["1", "2"],
     };
 
-    localStorage.setItem("currentUser", JSON.stringify(session));
-    setCurrentSession(session);
+    if (userType === "USER") {
+      localStorage.setItem("currentUser", JSON.stringify(session));
+      setCurrentSession(session);
+    } else if (userType === "ORGANIZER") {
+      localStorage.setItem("currentUser", JSON.stringify(ORGANIZERS[0]));
+      setCurrentSession(ORGANIZERS[0]);
+    }
+
     return true;
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.clear();
-    router.replace("/login");
-    router.refresh();
-  }, [router]);
+  const logout = useCallback(
+    (userType: UserType = "USER") => {
+      localStorage.clear();
+      setCurrentSession(null);
+      if (userType === "USER") {
+        router.replace("/login");
+      } else if (userType === "ORGANIZER") {
+        router.replace("/organizer");
+      }
+      router.refresh();
+    },
+    [router]
+  );
 
   useEffect(() => {
-    getUserSession();
-  }, [getUserSession]);
+    if (localStorage.getItem("currentUser")) {
+      const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
+      setCurrentSession(session);
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={{ currentUser, login, logout }}>{children}</AuthContext.Provider>
