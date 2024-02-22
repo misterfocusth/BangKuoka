@@ -1,5 +1,6 @@
 "use client";
 
+import { Organizer } from "@/app/types/organizer";
 import { useRouter } from "@/navigation";
 import { useCallback, useEffect, useState, createContext } from "react";
 
@@ -21,7 +22,7 @@ export type Session = {
 };
 
 interface IAuthContext {
-  currentUser: Session | null;
+  currentUser: Session | Organizer | null;
   login: () => boolean;
   logout: () => void;
 }

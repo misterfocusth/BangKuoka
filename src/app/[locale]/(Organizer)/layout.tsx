@@ -15,6 +15,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/navigation";
 import { Info } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import OrganizerProfileDropdown from "@/components/OrganizerProfileDropdown";
 
 const { Header, Content, Sider } = Layout;
 
@@ -70,8 +71,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
         </div>
         <div className="font-semibold text-xl">Bangkok Metropilitant Administration</div>
         <div className="flex flex-row items-center gap-4">
-          <LanguageSwitcher />
-          <LanguageSwitcher />
+          <OrganizerProfileDropdown />
         </div>
         {/* <div className="demo-logo" />
         <Menu

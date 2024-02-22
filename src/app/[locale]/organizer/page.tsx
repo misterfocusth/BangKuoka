@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React from "react";
 
-const AdminPage = () => {
+const OrganizerPage = () => {
   const t = useTranslations("Index");
   const router = useRouter();
 
@@ -69,4 +69,4 @@ const AdminPage = () => {
   );
 };
 
-export default AdminPage;
+export default OrganizerPage;
