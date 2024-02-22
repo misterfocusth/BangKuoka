@@ -13,9 +13,6 @@ import { Organizer } from "@/app/types/organizer";
 const getListData = (value: Dayjs, events: Event[] | null) => {
   let listData;
 
-  console.log(dayjs(events![0].start_date).date());
-  console.log(value.date());
-
   listData = events
     ?.filter(
       (e) =>

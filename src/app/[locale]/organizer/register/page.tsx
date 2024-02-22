@@ -208,8 +208,17 @@ const OrganizerRegisterPage = () => {
         </div>
       </div>
 
-      <div className="w-full mx-auto flex items-center justify-center">
-        <Button type="default" size="large" className="w-[75%] bg-[#0068B2] text-white">
+      <div className="w-full mx-auto flex items-center justify-center gap-8">
+        <Button type="default" size="large" className="w-[35%]" onClick={() => router.back()}>
+          Back to login
+        </Button>
+
+        <Button
+          type="default"
+          size="large"
+          className="w-[35%] bg-[#0068B2] text-white"
+          onClick={() => router.push("/organizer/dashboard")}
+        >
           Create a new account
         </Button>
       </div>
