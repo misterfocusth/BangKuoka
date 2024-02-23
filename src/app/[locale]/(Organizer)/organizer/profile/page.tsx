@@ -43,6 +43,10 @@ const OrganizerProfilePage = () => {
 
   return (
     <div>
+      {/* <div className="flex flex-row items-center gap-2 text-xl font-bold mb-6">
+        <CircleUser />
+        {"Organizer's Profile"}
+      </div> */}
       <div className="flex flex-row items-center gap-6">
         <Upload
           name="avatar"

@@ -9,6 +9,7 @@ import "./style.css";
 import { EVENTS } from "@/mock/events";
 import { AuthContext } from "@/contexts/AuthContext";
 import { Organizer } from "@/app/types/organizer";
+import { CalendarDaysIcon } from "lucide-react";
 
 const getListData = (value: Dayjs, events: Event[] | null) => {
   let listData;
@@ -72,6 +73,10 @@ const CalendarPage = () => {
 
   return (
     <div>
+      <div className="flex flex-row items-center gap-2 text-xl font-bold mb-6">
+        <CalendarDaysIcon />
+        Your event calendar
+      </div>
       <Calendar cellRender={cellRender} />
     </div>
   );
