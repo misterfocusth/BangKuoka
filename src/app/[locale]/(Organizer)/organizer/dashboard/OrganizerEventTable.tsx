@@ -92,7 +92,9 @@ const OrganizerEventTable: React.FC<OrganizerEventTableProps> = ({
       dataIndex: "isAvailableReservation",
       key: "isAvailableReservation",
       render: (_, record) =>
-        record.isAvailableReservation ? (
+        new Date().getTime() > record.startDateTime.getTime() ? (
+          <div>Ended</div>
+        ) : record.isAvailableReservation ? (
           <div className="text-green-500">Available</div>
         ) : (
           <div className="text-red-500">Not Available</div>
