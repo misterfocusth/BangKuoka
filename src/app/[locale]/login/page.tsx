@@ -20,7 +20,6 @@ import { KeyRound, Mail } from "lucide-react";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useRouter } from "@/navigation";
 
-import firebaseApp from "../../config/firebaseConfig";
 import { AuthContext } from "@/contexts/AuthContext";
 
 const LoginPage = () => {
