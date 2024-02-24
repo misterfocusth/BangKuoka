@@ -33,6 +33,10 @@ const NavbarContextProvider = ({ children }: { children: React.ReactNode }) => {
     } else {
       setTitle(title);
     }
+
+    if (document) {
+      document.title = title + "";
+    }
   };
   const setShowLanguageSwitcherState = (val: boolean) => setIsShowLanguageSwitcher(val);
   const setShowNavbarState = (val: boolean) => setIsShowNavbar(val);
