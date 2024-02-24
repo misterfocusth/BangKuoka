@@ -11,18 +11,20 @@ import {
   SettingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import React, { useEffect, useState, useTransition } from "react";
+import React, { useContext, useEffect, useState, useTransition } from "react";
 import { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/navigation";
 import { Info } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import OrganizerProfileDropdown from "@/components/OrganizerProfileDropdown";
+import { AuthContext } from "@/contexts/AuthContext";
+import { Organizer } from "@/app/types/organizer";
 
 const { Header, Content, Sider } = Layout;
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
-  const t = useTranslations("Index");
+  const currentUser = useContext(AuthContext).currentUser as Organizer;
   const router = useRouter();
 
   const [siderWidth, setSiderWidth] = useState(0);
@@ -57,7 +59,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
           <div className="text-xl font-bold text-[#136912]">
             Bang<span className="text-[#0068B2]">Kuoka</span>
           </div>
-          <div className="font-semibold text-xl">Bangkok Metropilitant Administration</div>
+          <div className="font-semibold text-xl">{currentUser?.name || ""}</div>
           <div className="flex flex-row items-center gap-4">
             <OrganizerProfileDropdown />
           </div>
