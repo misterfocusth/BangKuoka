@@ -148,7 +148,7 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
         <div className="flex flex-col">
           <div className="text-xl font-bold">Reservation Management</div>
           <div className="text-lg">
-            An information about event's reservation you can manege reservation on this section.
+            {"An information about event's reservation you can manege reservation on this section."}
           </div>
         </div>
 
