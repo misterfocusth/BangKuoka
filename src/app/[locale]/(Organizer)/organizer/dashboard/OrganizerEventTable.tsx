@@ -70,13 +70,17 @@ const OrganizerEventTable: React.FC<OrganizerEventTableProps> = ({
       title: "Start Time",
       dataIndex: "startDateTime",
       key: "startDateTime",
-      render: (value: Date) => <div>{value.toUTCString()}</div>,
+      render: (value: Date) => (
+        <div>{value.toLocaleDateString("en-US") + " " + value.toLocaleTimeString("en-US")}</div>
+      ),
     },
     {
       title: "End Time",
       dataIndex: "endDateTime",
       key: "endDateTime",
-      render: (value: Date) => <div>{value.toUTCString()}</div>,
+      render: (value: Date) => (
+        <div>{value.toLocaleDateString("en-US") + " " + value.toLocaleTimeString("en-US")}</div>
+      ),
     },
     {
       title: "Participant(s)",

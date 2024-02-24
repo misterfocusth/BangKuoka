@@ -59,7 +59,7 @@ const OrganizerPage = () => {
     }
 
     const organizer = querySnapshot.docs[0].data();
-    authContext.saveCurrentUser(organizer as Organizer);
+    authContext.saveCurrentUser(organizer as Organizer, querySnapshot.docs[0].id);
     toast.success(`LoggedIn, Welcome back ${organizer.name}`);
     router.replace("/organizer/dashboard");
   };

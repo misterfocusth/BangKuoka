@@ -12,14 +12,14 @@ type UserType = "ORGANIZER" | "USER";
 interface IAuthContext {
   setCurrentUser: Dispatch<SetStateAction<User | Organizer | null>>;
   currentUser: User | Organizer | null;
-  saveCurrentUser: (data: User | Organizer) => void;
+  saveCurrentUser: (data: User | Organizer, userId: string) => void;
   logout: (userType: UserType) => void;
 }
 
 const initialState: IAuthContext = {
   setCurrentUser: () => {},
   currentUser: null,
-  saveCurrentUser: (data: User | Organizer) => {},
+  saveCurrentUser: (data: User | Organizer, userId: string) => {},
   logout: (userType?: UserType) => {},
 };
 
@@ -31,7 +31,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
 
-  const saveCurrentUser = useCallback((data: User | Organizer) => {
+  const saveCurrentUser = useCallback((data: User | Organizer, userId: string) => {
     const session: User = {
       id: "1",
       first_name: "Sila",
@@ -57,8 +57,8 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     //   setCurrentUser(ORGANIZERS[0]);
     // }
 
-    setCurrentUser(data);
-    localStorage.setItem("currentUser", JSON.stringify(data));
+    setCurrentUser({ ...data, id: userId });
+    localStorage.setItem("currentUser", JSON.stringify({ ...data, id: userId }));
 
     return true;
   }, []);

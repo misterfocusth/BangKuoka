@@ -8,19 +8,40 @@ import OrganizerEventTable from "./OrganizerEventTable";
 import { CalendarDays, Edit, Settings } from "lucide-react";
 import { Button, Input, Select } from "antd";
 import { useRouter } from "@/navigation";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/app/config/firebaseConfig";
+import { Event } from "@/app/types/event";
 
 const OrganizerDashboardPage = () => {
   const router = useRouter();
   const currentUser = useContext(AuthContext).currentUser as Organizer;
-  const [events, setEvents] = useState(
-    EVENTS.filter((e) => e?.organizer_id == currentUser?.id) || []
-  );
+  const [events, setEvents] = useState<Event[] | null>(null);
 
   const [searchValue, setSearchValue] = useState("");
   const [sortingOption, setSortingOption] = useState<"ASD" | "DESC">("ASD");
 
+  const getEvents = async () => {
+    const eventRef = collection(db, "events");
+    const q = query(eventRef, where("organizer_id", "==", currentUser?.id));
+    const querySnapshot = await getDocs(q);
+
+    let events: Event[] = [];
+    for (let event of querySnapshot.docs) {
+      events.push({
+        ...event.data(),
+        start_date: new Date(event.data().start_date.toDate()),
+        end_date: new Date(event.data().end_date.toDate()),
+        organizer: currentUser,
+      } as Event);
+    }
+
+    setEvents(events);
+  };
+
   useEffect(() => {
-    setEvents(EVENTS.filter((e) => e?.organizer_id == currentUser?.id) || []);
+    if (currentUser) {
+      getEvents();
+    }
   }, [currentUser]);
 
   if (!events) return <></>;
