@@ -1,8 +1,8 @@
 import { Reservation } from "@/app/types/reservation";
-import { Session } from "@/contexts/AuthContext";
 import { EVENTS } from "./events";
+import { User } from "@/app/types/user";
 
-const currentUser: Session = {
+const fakeUser: User = {
   id: "1",
   first_name: "Sila",
   last_name: "Pakdeewong",
@@ -21,7 +21,7 @@ export const RESERVATIONS: Reservation[] = [
   {
     id: "1",
     user_id: "1",
-    user: currentUser,
+    user: fakeUser,
     event_id: "2",
     event: EVENTS[1],
     status_id: 0,
@@ -31,7 +31,7 @@ export const RESERVATIONS: Reservation[] = [
   {
     id: "1",
     user_id: "1",
-    user: currentUser,
+    user: fakeUser,
     event_id: "1",
     event: EVENTS[0],
     status_id: 1,
@@ -41,7 +41,7 @@ export const RESERVATIONS: Reservation[] = [
   {
     id: "1",
     user_id: "1",
-    user: currentUser,
+    user: fakeUser,
     event_id: "2",
     event: EVENTS[1],
     status_id: 2,

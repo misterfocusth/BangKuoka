@@ -20,7 +20,6 @@ import { KeyRound, Mail } from "lucide-react";
 import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useRouter } from "@/navigation";
 
-import firebaseApp from "../../config/firebaseConfig";
 import { AuthContext } from "@/contexts/AuthContext";
 
 const LoginPage = () => {
@@ -30,7 +29,7 @@ const LoginPage = () => {
   const t = useTranslations("Index");
 
   const handleLogin = () => {
-    const isLoggedIn = authContenxt.login();
+    const isLoggedIn = authContenxt.login("USER");
 
     if (isLoggedIn) {
       router.push("/home");
@@ -80,7 +79,7 @@ const LoginPage = () => {
         <p className=" text-right mt-6 pr-2 text-[#136912]">{t("forgot_password_label")}</p>
 
         <Button
-          className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center"
+          className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center animate-pulse"
           size="large"
           type="primary"
           onClick={handleLogin}

@@ -35,7 +35,7 @@ const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizer }) =>
               width="1920"
               height="1080"
               alt="organizer"
-              className="w-20 h-20"
+              className="w-20 h-20 rounded-full"
             />
             <div>
               <div className="font-semibold">{organizer.name}</div>

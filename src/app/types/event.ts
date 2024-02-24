@@ -12,15 +12,17 @@ export type Event = {
   end_time: string;
   loc_name: string;
   loc_address: string;
-  trans_bus: string;
-  trans_train: string;
-  trans_boat: string;
-  trans_taxi: string;
+  trans_bus?: string;
+  trans_train?: string;
+  trans_boat?: string;
+  trans_taxi?: string;
   participant_num: number;
   is_allow_reserve: boolean;
   organizer_id: string;
   unlisted_on: string | null;
   country: "BKK" | "FK";
+  views: number;
+  is_limit_participant: boolean;
 
   organizer: Organizer;
 };

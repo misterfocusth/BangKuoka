@@ -1,6 +1,7 @@
 "use client";
 
 import { Event } from "@/app/types/event";
+import { User } from "@/app/types/user";
 import SaveEventButton from "@/components/button/SaveEventButton";
 import EventCategoryChip from "@/components/chip/EventCategoryChip";
 import { AuthContext } from "@/contexts/AuthContext";
@@ -29,8 +30,8 @@ interface EventIdPageClientProps {
 
 const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventData }) => {
   const authContext = useContext(AuthContext);
-
-  const isUserSaveEvent = authContext.currentUser?.saved_events?.some((e) => e === eventId);
+  const currentUser = authContext.currentUser as User;
+  const isUserSaveEvent = currentUser?.saved_events?.some((e) => e === eventId);
 
   const router = useRouter();
   const t = useTranslations("Index");

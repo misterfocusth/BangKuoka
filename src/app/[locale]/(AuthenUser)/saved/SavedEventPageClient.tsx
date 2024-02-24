@@ -9,10 +9,11 @@ import WideEventCard from "../reservation/WideEventCard";
 import { Event } from "@/app/types/event";
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { Empty } from "antd";
+import { User } from "@/app/types/user";
 
 const SavedEventPageClient = () => {
   const router = useRouter();
-  const { currentUser } = useContext(AuthContext);
+  const currentUser = useContext(AuthContext).currentUser as User;
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { User } from "@/app/types/user";
 import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
@@ -11,7 +12,7 @@ import {
   Info,
   KeyRound,
   LogOut,
-  User,
+  User as UserIcon,
   UserRoundCog,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -20,7 +21,9 @@ import React, { useContext, useEffect } from "react";
 const ProfilePage = () => {
   const t = useTranslations("Index");
   const router = useRouter();
-  const authContext = useContext(AuthContext);
+  let { currentUser, logout } = useContext(AuthContext);
+
+  currentUser = useContext(AuthContext).currentUser as User;
   const navbarContext = useContext(NavbarContext);
 
   useEffect(() => {
@@ -30,19 +33,17 @@ const ProfilePage = () => {
   return (
     <div>
       <div className="flex items-center gap-6">
-        {authContext.currentUser?.profile_image_src ? (
-          <Avatar size={96} src={authContext.currentUser?.profile_image_src} />
+        {currentUser?.profile_image_src ? (
+          <Avatar size={96} src={currentUser?.profile_image_src} />
         ) : (
-          <Avatar size={96} icon={<User size={42} />} />
+          <Avatar size={96} icon={<UserIcon size={42} />} />
         )}
         <div className="flex flex-col gap-1">
           <div className=" font-semibold text-lg">
-            {authContext.currentUser?.first_name + " " + authContext.currentUser?.last_name}
+            {currentUser?.first_name + " " + currentUser?.last_name}
           </div>
           <div className="text-[#136912]">
-            {authContext.currentUser?.nationality === "TH"
-              ? t("bangkok_th_label")
-              : t("fukuoka_jp_label")}
+            {currentUser?.nationality === "TH" ? t("bangkok_th_label") : t("fukuoka_jp_label")}
           </div>
         </div>
       </div>
@@ -96,7 +97,7 @@ const ProfilePage = () => {
         className="flex items-center w-full justify-center mt-6"
         icon={<LogOut size={18} />}
         onClick={() => {
-          authContext.logout();
+          logout("USER");
         }}
       >
         {t("logout_label")}

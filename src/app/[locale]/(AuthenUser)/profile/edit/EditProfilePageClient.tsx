@@ -19,11 +19,12 @@ import {
 import Password from "antd/es/input/Password";
 import TextArea from "antd/es/input/TextArea";
 import dayjs from "dayjs";
-import { Edit, FileType, ImagePlus, KeyRound, Mail, Phone, User } from "lucide-react";
+import { Edit, FileType, ImagePlus, KeyRound, Mail, Phone, User as UserIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import React, { useContext, useEffect, useState } from "react";
 import { Group } from "antd/es/radio";
 import toast from "react-hot-toast";
+import { User } from "@/app/types/user";
 
 const dateFormat = "DD MMMM YYYY";
 
@@ -35,20 +36,9 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
   reader.readAsDataURL(img);
 };
 
-const beforeUpload = (file: FileType) => {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    toast.error("You can only upload JPG/PNG file!");
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    toast.error("Image must smaller than 2MB!");
-  }
-  return isJpgOrPng && isLt2M;
-};
-
 const EditProfilePageClient = () => {
-  const { currentUser } = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
+  const currentUser = authContext.currentUser as User;
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
 
@@ -145,14 +135,14 @@ const EditProfilePageClient = () => {
           >
             {imageUrl ? (
               <div className="relative">
-                <Avatar size={102} icon={<User size={42} />} src={imageUrl} />
+                <Avatar size={102} icon={<UserIcon size={42} />} src={imageUrl} />
                 <div className=" absolute right-0 bottom-0 rounded-full bg-[#136912] flex items-center justify-center p-2">
                   <Edit size={16} color="#fff" className="p-0 m-auto" />
                 </div>
               </div>
             ) : (
               <div className="relative">
-                <Avatar size={102} icon={<User size={42} />} />
+                <Avatar size={102} icon={<UserIcon size={42} />} />
                 <div className=" absolute right-0 bottom-0 rounded-full bg-[#136912] flex items-center justify-center p-2">
                   <ImagePlus size={16} color="#fff" className="p-0 m-auto" />
                 </div>
