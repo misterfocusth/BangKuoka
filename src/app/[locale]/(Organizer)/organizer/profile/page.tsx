@@ -2,6 +2,7 @@
 
 import { Organizer } from "@/app/types/organizer";
 import { AuthContext } from "@/contexts/AuthContext";
+import { EVENTS } from "@/mock/events";
 import { useRouter } from "@/navigation";
 import { Avatar, Button, GetProp, Statistic, Upload, UploadProps } from "antd";
 import {
@@ -16,7 +17,7 @@ import {
   MapPin,
   UserIcon,
 } from "lucide-react";
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -92,7 +93,7 @@ const OrganizerProfilePage = () => {
         </div>
       </div>
 
-      <div className="mt-6 flex flex-row items-center gap-2 text-xl font-bold text-[#0068B2]">
+      <div className="mt-6 flex flex-row items-center gap-2 text-lg font-bold text-[#0068B2]">
         <AreaChart />
         Stats for organizers and events.
       </div>

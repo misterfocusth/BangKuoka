@@ -1,9 +1,10 @@
 "use client";
 
+import { EVENTS } from "@/mock/events";
 import { useRouter } from "@/navigation";
 import { Button, DatePicker, GetProp, Image, Input, Switch, Upload, UploadProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import {
   Bus,
   CalendarClock,
@@ -17,7 +18,11 @@ import {
   Ship,
   TrainFrontIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+
+interface ManageEventIdPageParams {
+  id: string;
+}
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -27,30 +32,32 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
   reader.readAsDataURL(img);
 };
 
-const CreateEventPage = () => {
+const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
+  const eventData = EVENTS.find((e) => e.organizer_id == params.id);
+
   const router = useRouter();
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [name, setName] = useState(eventData?.event_name || "");
+  const [description, setDescription] = useState(eventData?.description || "");
+  const [imageUrl, setImageUrl] = useState(eventData?.event_image_src || "");
 
-  const [startDate, setStartDate] = useState<Dayjs | null>(null);
-  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(eventData?.start_date) || null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(eventData?.end_date) || null);
 
-  const [locationName, setLocationName] = useState("");
-  const [locationAddress, setLocationAddress] = useState("");
+  const [locationName, setLocationName] = useState(eventData?.loc_name || "");
+  const [locationAddress, setLocationAddress] = useState(eventData?.loc_address || "");
 
   const [publicTransportation, setPublicTransportation] = useState({
-    bus: "",
-    train: "",
-    boat: "",
-    taxi: "",
+    bus: eventData?.trans_boat || "",
+    train: eventData?.trans_train || "",
+    boat: eventData?.trans_boat || "",
+    taxi: eventData?.trans_taxi || "",
   });
 
   const [reservationOption, setReservationOption] = useState({
-    isAvailableReservation: false,
-    isLimitParticipant: false,
-    maxParticipants: 0,
+    isAvailableReservation: eventData?.is_allow_reserve || false,
+    isLimitParticipant: eventData?.is_limit_participant || false,
+    maxParticipants: eventData?.participant_num || 0,
   });
 
   const handleEventImageChange: UploadProps["onChange"] = (file) => {
@@ -59,13 +66,15 @@ const CreateEventPage = () => {
     });
   };
 
-  const handleCreateNewEvent = () => {};
+  if (!eventData) return <></>;
+
+  const handleEditEvent = () => {};
   return (
     <div>
       <div className="flex flex-row items-center justify-between gap-2  mb-6">
         <div className="flex flex-row items-center gap-2 text-xl font-bold">
           <Edit />
-          Create Event
+          Edit Event Information
         </div>
 
         <div className="flex items-center gap-4">
@@ -81,9 +90,9 @@ const CreateEventPage = () => {
             size="large"
             type="primary"
             className="flex items-center gap-1"
-            onClick={handleCreateNewEvent}
+            onClick={handleEditEvent}
           >
-            Save & Create Event
+            Save Change & Edit Event
           </Button>
         </div>
       </div>
@@ -357,4 +366,4 @@ const CreateEventPage = () => {
   );
 };
 
-export default CreateEventPage;
+export default EditEventPage;

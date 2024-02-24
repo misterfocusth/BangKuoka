@@ -24,6 +24,8 @@ export const EVENTS: Event[] = [
     unlisted_on: null,
     organizer: ORGANIZERS[0],
     country: "BKK",
+    views: 1000,
+    is_limit_participant: false,
   },
   {
     id: "2",
@@ -46,6 +48,8 @@ export const EVENTS: Event[] = [
     unlisted_on: null,
     organizer: ORGANIZERS[1],
     country: "FK",
+    views: 1000,
+    is_limit_participant: false,
   },
   {
     id: "3",
@@ -71,6 +75,8 @@ export const EVENTS: Event[] = [
     unlisted_on: null,
     organizer: ORGANIZERS[1],
     country: "FK",
+    views: 1000,
+    is_limit_participant: false,
   },
   {
     id: "4",
@@ -93,5 +99,7 @@ export const EVENTS: Event[] = [
     unlisted_on: null,
     organizer: ORGANIZERS[0],
     country: "BKK",
+    views: 1000,
+    is_limit_participant: false,
   },
 ];

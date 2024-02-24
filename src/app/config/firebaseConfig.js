@@ -16,6 +16,7 @@ const firebaseConfig = {
 let firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
 isSupported().then(res => {
+    console.log("Firebase Analytics Enabled!")
     if (res) getAnalytics(firebaseApp)
 })
 

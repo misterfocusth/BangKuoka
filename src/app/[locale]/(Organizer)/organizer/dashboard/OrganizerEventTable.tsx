@@ -99,8 +99,10 @@ const OrganizerEventTable: React.FC<OrganizerEventTableProps> = ({
       key: "action",
       render: (_, record) => (
         <Space size={"middle"}>
-          <Button>Manage / Stats</Button>
-          <Button>Edit</Button>
+          <Button onClick={() => router.push("/organizer/event/manage/" + record.key)}>
+            Manage / Stats
+          </Button>
+          <Button onClick={() => router.push("/organizer/event/edit/" + record.key)}>Edit</Button>
         </Space>
       ),
     },

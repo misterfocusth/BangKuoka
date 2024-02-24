@@ -21,6 +21,8 @@ export type Event = {
   organizer_id: string;
   unlisted_on: string | null;
   country: "BKK" | "FK";
+  views: number;
+  is_limit_participant: boolean;
 
   organizer: Organizer;
 };
