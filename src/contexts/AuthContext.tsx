@@ -5,21 +5,21 @@ import { Organizer } from "@/app/types/organizer";
 import { User } from "@/app/types/user";
 import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
-import { useCallback, useEffect, useState, createContext } from "react";
+import { useCallback, useEffect, useState, createContext, Dispatch, SetStateAction } from "react";
 
 type UserType = "ORGANIZER" | "USER";
 
 interface IAuthContext {
+  setCurrentUser: Dispatch<SetStateAction<User | Organizer | null>>;
   currentUser: User | Organizer | null;
-  login: (userType: UserType) => boolean;
+  saveCurrentUser: (data: User | Organizer) => void;
   logout: (userType: UserType) => void;
 }
 
 const initialState: IAuthContext = {
+  setCurrentUser: () => {},
   currentUser: null,
-  login: (userType?: UserType) => {
-    return true;
-  },
+  saveCurrentUser: (data: User | Organizer) => {},
   logout: (userType?: UserType) => {},
 };
 
@@ -29,9 +29,9 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentSession] = useState<User | Organizer | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
 
-  const login = useCallback((userType: UserType = "USER") => {
+  const saveCurrentUser = useCallback((data: User | Organizer) => {
     const session: User = {
       id: "1",
       first_name: "Sila",
@@ -49,13 +49,16 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       saved_events: ["1", "2"],
     };
 
-    if (userType === "USER") {
-      localStorage.setItem("currentUser", JSON.stringify(session));
-      setCurrentSession(session);
-    } else if (userType === "ORGANIZER") {
-      localStorage.setItem("currentUser", JSON.stringify(ORGANIZERS[0]));
-      setCurrentSession(ORGANIZERS[0]);
-    }
+    // if (userType === "USER") {
+    //   localStorage.setItem("currentUser", JSON.stringify(session));
+    //   setCurrentUser(session);
+    // } else if (userType === "ORGANIZER") {
+    //   localStorage.setItem("currentUser", JSON.stringify(ORGANIZERS[0]));
+    //   setCurrentUser(ORGANIZERS[0]);
+    // }
+
+    setCurrentUser(data);
+    localStorage.setItem("currentUser", JSON.stringify(data));
 
     return true;
   }, []);
@@ -63,7 +66,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = useCallback(
     (userType: UserType = "USER") => {
       localStorage.clear();
-      setCurrentSession(null);
+      setCurrentUser(null);
       if (userType === "USER") {
         router.replace("/login");
       } else if (userType === "ORGANIZER") {
@@ -77,14 +80,16 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (localStorage.getItem("currentUser")) {
       const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
-      setCurrentSession(session);
+      setCurrentUser(session);
     }
 
     initFirebase();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{ setCurrentUser, currentUser, saveCurrentUser, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
 };
 

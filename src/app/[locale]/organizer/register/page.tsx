@@ -1,9 +1,12 @@
 "use client";
 
+import { db, storage } from "@/app/config/firebaseConfig";
 import { useRouter } from "@/navigation";
-import { Avatar, Button, GetProp, Input, Select, Upload, UploadProps } from "antd";
+import { Avatar, Button, GetProp, Input, Select, Spin, Upload, UploadProps } from "antd";
 import Password from "antd/es/input/Password";
 import TextArea from "antd/es/input/TextArea";
+import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { UploadResult, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import {
   ChevronLeft,
   Edit,
@@ -15,6 +18,7 @@ import {
   UserIcon,
 } from "lucide-react";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -38,10 +42,107 @@ const OrganizerRegisterPage = () => {
   const [password, setPassword] = useState("");
   const [cfPassword, setCfPassword] = useState("");
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleChangeProfileImage: UploadProps["onChange"] = (file) => {
     getBase64(file.file.originFileObj as FileType, (url) => {
       setImageUrl(url);
     });
+  };
+
+  const uploadAndRegister = (imageBlob: Blob) => {
+    let uploadedImageUrl = "";
+    const storageRef = ref(storage, "profiles/organizer/" + Date.now());
+    uploadBytes(storageRef, imageBlob)
+      .then((result: UploadResult) => {
+        return getDownloadURL(result.ref);
+      })
+      .then((url) => (uploadedImageUrl = url))
+      .then(() => {
+        return addDoc(collection(db, "organizers"), {
+          name,
+          email,
+          phone_number: phoneNumber,
+          website,
+          country: selectedCountry,
+          address: address,
+          description,
+          password: cfPassword,
+          event: [],
+          icon_image_src: uploadedImageUrl,
+        });
+      })
+      .then((result) => console.log(result))
+      .catch((err) => console.log(err));
+
+    return uploadedImageUrl;
+  };
+
+  const validateFormData = () => {
+    const organizerData = {
+      name,
+      email,
+      phone_number: phoneNumber,
+      website,
+      country: selectedCountry,
+      address: address,
+      description,
+      password: cfPassword,
+    };
+
+    for (let key of Object.keys(organizerData)) {
+      if (!organizerData[key as keyof typeof organizerData]) return false;
+    }
+
+    return true;
+  };
+
+  const handleRegister = async () => {
+    setIsLoading(true);
+
+    if (!validateFormData()) {
+      toast.error("Error, please fill organizer's info.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (password != cfPassword) {
+      toast.error("Error, Password did not match.");
+      setIsLoading(false);
+      return;
+    }
+
+    const organizerRef = collection(db, "organizers");
+    const q = query(organizerRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      toast.error("This email has been used, please use other email address.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (imageUrl) {
+      const imageBlob = await (await fetch(imageUrl)).blob();
+      uploadAndRegister(imageBlob);
+    } else {
+      await addDoc(collection(db, "organizers"), {
+        name,
+        email,
+        phone_number: phoneNumber,
+        website,
+        country: selectedCountry,
+        address: address,
+        description,
+        password: cfPassword,
+        event: [],
+        icon_image_src: "",
+      }).catch((err) => console.log(err));
+    }
+
+    setIsLoading(false);
+
+    toast.success("Successfully, you can now login with your organizer account.");
+    router.replace("/organizer");
   };
 
   return (
@@ -77,6 +178,7 @@ const OrganizerRegisterPage = () => {
               <p className="m-0 ml-1 mb-3 font-semibold">{"Phone Number"}</p>
               <Input
                 className="h-12"
+                type="number"
                 size="large"
                 value={phoneNumber}
                 placeholder={"e.g. +6612-345-6789"}
@@ -129,6 +231,7 @@ const OrganizerRegisterPage = () => {
                 className="h-12"
                 size="large"
                 value={website}
+                type="url"
                 placeholder={"e.g. http://www.google.com"}
                 onChange={(e) => setWebsite(e.currentTarget.value)}
               />
@@ -139,6 +242,7 @@ const OrganizerRegisterPage = () => {
               <Input
                 className="h-12"
                 size="large"
+                type="email"
                 value={email}
                 placeholder={"e.g. hello@world.com"}
                 onChange={(e) => setEmail(e.currentTarget.value)}
@@ -217,7 +321,9 @@ const OrganizerRegisterPage = () => {
           type="default"
           size="large"
           className="w-[35%] bg-[#0068B2] text-white"
-          onClick={() => router.push("/organizer/dashboard")}
+          // onClick={() => router.push("/organizer/dashboard")}
+          onClick={handleRegister}
+          loading={isLoading}
         >
           Create a new account
         </Button>

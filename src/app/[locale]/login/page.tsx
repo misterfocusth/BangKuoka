@@ -29,7 +29,7 @@ const LoginPage = () => {
   const t = useTranslations("Index");
 
   const handleLogin = () => {
-    const isLoggedIn = authContenxt.login("USER");
+    const isLoggedIn = authContenxt.saveCurrentUser("USER");
 
     if (isLoggedIn) {
       router.push("/home");

@@ -48,20 +48,18 @@ const OrganizerProfilePage = () => {
         <CircleUser />
         {"Organizer's Profile"}
       </div> */}
-      <div className="flex flex-row items-center gap-6">
+      <div className="flex flex-row items-center gap-4">
         <Upload
           name="avatar"
           listType="picture-circle"
           className="avatar-uploader w-fit"
           showUploadList={false}
+          disabled
           onChange={handleChangeProfileImage}
         >
           {imageUrl ? (
             <div className="relative">
               <Avatar size={102} icon={<UserIcon size={42} />} src={imageUrl} />
-              <div className=" absolute right-0 bottom-0 rounded-full bg-[#0068B2] flex items-center justify-center p-2">
-                <Edit size={16} color="#fff" className="p-0 m-auto" />
-              </div>
             </div>
           ) : (
             <div className="relative">

@@ -1,14 +1,17 @@
 "use client";
 
+import { db } from "@/app/config/firebaseConfig";
 import { Organizer } from "@/app/types/organizer";
 import { AuthContext } from "@/contexts/AuthContext";
 import { useRouter } from "@/navigation";
 import { Button, Input } from "antd";
 import Password from "antd/es/input/Password";
+import { collection, getDoc, getDocs, query, where } from "firebase/firestore";
 import { KeyRound, Mail } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import React, { useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const OrganizerPage = () => {
   const t = useTranslations("Index");
@@ -16,6 +19,8 @@ const OrganizerPage = () => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(true);
+  const [email, setEmail] = useState("bangkok@bangkok.go.th");
+  const [password, setPassword] = useState("123456789");
 
   useEffect(() => {
     const currentUser = authContext.currentUser as Organizer;
@@ -30,6 +35,34 @@ const OrganizerPage = () => {
   if (isLoading) {
     return <></>;
   }
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      toast.error("Please provide your organizer email and password.");
+      return;
+    }
+
+    const organizerRef = collection(db, "organizers");
+    const q = query(organizerRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+      toast.error("Invalid credentials.");
+      return;
+    }
+
+    const savedPassword = querySnapshot.docs[0].data().password;
+
+    if (password !== savedPassword) {
+      toast.error("Invalid credentials.");
+      return;
+    }
+
+    const organizer = querySnapshot.docs[0].data();
+    authContext.saveCurrentUser(organizer as Organizer);
+    toast.success(`LoggedIn, Welcome back ${organizer.name}`);
+    router.replace("/organizer/dashboard");
+  };
 
   return (
     <div className="min-h-screen bg-[#0068B2] grid grid-cols-2">
@@ -54,6 +87,8 @@ const OrganizerPage = () => {
               size="large"
               placeholder={t("email_label")}
               prefix={<Mail className="mr-2" />}
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
             />
             <Password
               className="py-3 mt-4"
@@ -61,6 +96,8 @@ const OrganizerPage = () => {
               placeholder={t("password_label")}
               prefix={<KeyRound className="mr-2" />}
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.currentTarget.value)}
             />
           </div>
 
@@ -71,13 +108,8 @@ const OrganizerPage = () => {
           <Button
             size="large"
             className="w-full font-bold mt-12 p-6 flex flex-row items-center justify-center"
-            onClick={() => {
-              if (authContext.login("ORGANIZER")) {
-                router.replace("/organizer/dashboard");
-              } else {
-                alert("Incorrect Credentials.");
-              }
-            }}
+            onClick={handleLogin}
+            loading={isLoading}
           >
             {t("login_title")}
           </Button>

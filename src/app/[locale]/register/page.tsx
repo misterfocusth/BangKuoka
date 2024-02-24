@@ -24,6 +24,8 @@ import { Group, RadioChangeEvent } from "antd/es/radio";
 
 // Navigation
 import { useRouter } from "@/navigation";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "@/app/config/firebaseConfig";
 
 const dateFormat = "DD MMMM YYYY";
 
@@ -52,7 +54,7 @@ const RegisterPage = () => {
     console.log(typeof date, typeof dateString);
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     router.push("/landing/1");
   };
 
