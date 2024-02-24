@@ -29,6 +29,7 @@ const OrganizerDashboardPage = () => {
     for (let event of querySnapshot.docs) {
       events.push({
         ...event.data(),
+        id: event.id,
         start_date: new Date(event.data().start_date.toDate()),
         end_date: new Date(event.data().end_date.toDate()),
         organizer: currentUser,

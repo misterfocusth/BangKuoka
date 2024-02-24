@@ -39,6 +39,7 @@ const CalendarPage = () => {
     for (let event of querySnapshot.docs) {
       events.push({
         ...event.data(),
+        id: event.id,
         start_date: new Date(event.data().start_date.toDate()),
         end_date: new Date(event.data().end_date.toDate()),
         organizer: currentUser,
@@ -51,16 +52,6 @@ const CalendarPage = () => {
   useEffect(() => {
     getEvents();
   }, [currentUser]);
-
-  //   const monthCellRender = (value: Dayjs) => {
-  //     const num = getMonthData(value);
-  //     return num ? (
-  //       <div className="notes-month">
-  //         <section>{num}</section>
-  //         <span>Backlog number</span>
-  //       </div>
-  //     ) : null;
-  //   };
 
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value, events);
