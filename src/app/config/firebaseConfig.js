@@ -2,6 +2,7 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCXYP0bmOQONa_HedUayJ-B8QtYd6zIUwA",
@@ -15,14 +16,23 @@ const firebaseConfig = {
 
 let firebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
-isSupported().then(res => {
-    console.log("Firebase Analytics Enabled!")
-    if (res) getAnalytics(firebaseApp)
-})
+let db = getFirestore();
+let storage = getStorage();
+let auth = getAuth();
 
-export const db = getFirestore();
-export const storage = getStorage();
+const initFirebase = () => {
+    // isSupported().then(res => {
+    //     console.log("Firebase Analytics Enabled!")
+    //     console.log(res)
+    //     if (res) 
+    // })
 
-export default firebaseApp;
+    getAnalytics(firebaseApp)
+    db = getFirestore(firebaseApp);
+    storage = getStorage(firebaseApp);
+    auth = getAuth(firebaseApp)
+}
+
+export { firebaseApp, initFirebase, db, storage, auth };
 
 

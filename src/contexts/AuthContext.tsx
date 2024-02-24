@@ -1,5 +1,6 @@
 "use client";
 
+import { db, firebaseApp, initFirebase } from "@/app/config/firebaseConfig";
 import { Organizer } from "@/app/types/organizer";
 import { User } from "@/app/types/user";
 import { ORGANIZERS } from "@/mock/organizers";
@@ -78,6 +79,8 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
       setCurrentSession(session);
     }
+
+    initFirebase();
   }, []);
 
   return (
