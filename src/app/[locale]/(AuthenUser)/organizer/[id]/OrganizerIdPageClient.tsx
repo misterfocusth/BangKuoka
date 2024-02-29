@@ -142,7 +142,7 @@ const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizer }) =>
               id={event.id}
               eventImageSrc={event.event_image_src}
               eventName={event.event_name}
-              description={event.description.substring(0, 50)}
+              description={event.description ? event.description.substring(0, 50) : ""}
               startDate={event.start_date}
               categoryId={event.category_id}
             />

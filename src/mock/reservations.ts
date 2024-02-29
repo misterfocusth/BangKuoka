@@ -7,7 +7,7 @@ const fakeUser: User = {
   first_name: "Sila",
   last_name: "Pakdeewong",
   gender: "MALE",
-  dob: "18 December 2003",
+  dob: new Date(),
   nationality: "TH",
   phone_number: "+6665-652-6769",
   address: "School of Information Technology, KMITL, 1, Chalong Krung 1, Ladkrabang, Bangkok 10520",
