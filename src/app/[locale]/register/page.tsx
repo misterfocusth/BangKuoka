@@ -1,7 +1,7 @@
 "use client";
 
 // React
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 
 // Antd
 import { Button, Checkbox, DatePicker, DatePickerProps, Divider, Input, Select } from "antd";
@@ -24,17 +24,37 @@ import { Group, RadioChangeEvent } from "antd/es/radio";
 
 // Navigation
 import { useRouter } from "@/navigation";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { db } from "@/app/config/firebaseConfig";
+import toast from "react-hot-toast";
+import { AuthContext } from "@/contexts/AuthContext";
+import { User } from "@/app/types/user";
 
 const dateFormat = "DD MMMM YYYY";
 
 const RegisterPage = () => {
   const router = useRouter();
+  const authContext = useContext(AuthContext);
   const t = useTranslations("Index");
 
+  const [name, setName] = useState({
+    firstName: "",
+    lastName: "",
+  });
+  const [contact, setContact] = useState({
+    phoneNumber: "",
+    email: "",
+    address: "",
+  });
+  const [password, setPassword] = useState("");
+  const [cfPassword, setCfPassword] = useState("");
+
+  const [dob, setDob] = useState(dayjs());
   const [selectedGender, setSelectedGender] = useState<"MALE" | "FEMALE">("MALE");
   const [selectedNationality, setSelectedNationality] = useState<"TH" | "JP">("TH");
-  const [address, setAddress] = useState<String>("");
   const [isAcceptTerms, setIsAcceptTerms] = useState<Boolean>(false);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const genderOptions = [
     { label: t("sex_male_label"), value: "MALE" },
@@ -50,10 +70,74 @@ const RegisterPage = () => {
   const onChange: DatePickerProps["onChange"] = (date, dateString) => {
     console.log(date, dateString);
     console.log(typeof date, typeof dateString);
+    setDob(date);
   };
 
-  const handleRegister = () => {
-    router.push("/landing/1");
+  const validateFormData = () => {
+    const formData = {
+      first_name: name.firstName,
+      last_name: name.lastName,
+      gender: selectedGender,
+      dob,
+      nationality: selectedNationality,
+      phone_number: contact.phoneNumber,
+      email: contact.email,
+      address: contact.address,
+      password,
+      cfPassword,
+    };
+
+    for (let key of Object.keys(formData)) {
+      if (!formData[key as keyof typeof formData]) {
+        console.log(key);
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleRegister = async () => {
+    setIsLoading(true);
+
+    // validate
+    const isUserInputValid = validateFormData();
+
+    if (!isUserInputValid) {
+      setIsLoading(false);
+      toast.error("Error, invalid form data, or some fields missing.");
+      return;
+    } else if (password !== cfPassword) {
+      setIsLoading(false);
+      toast.error("Error, password mismatch");
+      return;
+    } else if (!isAcceptTerms) {
+      setIsLoading(false);
+      toast.error("Please accept terms & condition");
+      return;
+    }
+
+    // data
+    const newUserData = {
+      first_name: name.firstName,
+      last_name: name.lastName,
+      gender: selectedGender,
+      dob: dob.toDate(),
+      nationality: selectedNationality,
+      phone_number: contact.phoneNumber,
+      email: contact.email,
+      address: contact.address,
+      interests: [],
+      saved_events: [],
+      password: password,
+    };
+
+    addDoc(collection(db, "users"), newUserData).then((result) => {
+      setIsLoading(false);
+      toast.success("Successfully, you can now login with your organizer account.");
+      authContext.saveCurrentUser({ ...newUserData, id: result.id } as User);
+      router.push("/landing/1");
+    });
   };
 
   return (
@@ -68,8 +152,23 @@ const RegisterPage = () => {
         <div className="mt-6">
           <p className="m-0 ml-1 mb-3 font-bold">{t("name_label")}</p>
           <div className="flex flex-row gap-2">
-            <Input className="h-12" size="large" placeholder={t("first_name_label")} />
-            <Input className="h-12" size="large" placeholder={t("last_name_label")} />
+            <Input
+              className="h-12"
+              size="large"
+              placeholder={t("first_name_label")}
+              onChange={(e) => setName((prev) => ({ ...prev, firstName: e.currentTarget.value }))}
+            />
+            <Input
+              className="h-12"
+              size="large"
+              placeholder={t("last_name_label")}
+              onChange={(e) =>
+                setName((prev) => ({
+                  ...prev,
+                  lastName: e.currentTarget.value,
+                }))
+              }
+            />
           </div>
         </div>
 
@@ -116,7 +215,13 @@ const RegisterPage = () => {
             placeholder={t("address_placeholder")}
             size="large"
             rows={4}
-            onChange={(e) => setAddress(e.currentTarget.value)}
+            value={contact.address}
+            onChange={(e) =>
+              setContact((prev) => ({
+                ...prev,
+                address: e.currentTarget.value,
+              }))
+            }
           />
         </div>
 
@@ -127,6 +232,13 @@ const RegisterPage = () => {
             size="large"
             placeholder={t("email_placeholder")}
             prefix={<Mail className="mr-2" />}
+            value={contact.email}
+            onChange={(e) =>
+              setContact((prev) => ({
+                ...prev,
+                email: e.currentTarget.value,
+              }))
+            }
           />
         </div>
 
@@ -137,6 +249,13 @@ const RegisterPage = () => {
             size="large"
             placeholder={t("phone_number_placeholder")}
             prefix={<Phone className="mr-2" />}
+            value={contact.phoneNumber}
+            onChange={(e) =>
+              setContact((prev) => ({
+                ...prev,
+                phoneNumber: e.currentTarget.value,
+              }))
+            }
           />
         </div>
 
@@ -148,6 +267,8 @@ const RegisterPage = () => {
             placeholder={t("password_holder")}
             prefix={<KeyRound className="mr-2" />}
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
           />
         </div>
 
@@ -159,6 +280,8 @@ const RegisterPage = () => {
             placeholder={t("confirm_password")}
             prefix={<KeyRound className="mr-2" />}
             type="password"
+            value={cfPassword}
+            onChange={(e) => setCfPassword(e.currentTarget.value)}
           />
         </div>
 
@@ -180,6 +303,7 @@ const RegisterPage = () => {
           size="large"
           type="primary"
           onClick={handleRegister}
+          loading={isLoading}
         >
           {t("register_new_account_label")}
         </Button>

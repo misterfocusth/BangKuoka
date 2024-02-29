@@ -11,7 +11,7 @@ const EventIdPage = ({ params }: { params: EventIdPageParams }) => {
   const eventData: Event = EVENTS.filter((e) => e.id === params.id)[0];
   console.log(eventData);
 
-  return <EventIdPageClient eventId={params.id} eventData={eventData} />;
+  return <EventIdPageClient eventId={params.id} />;
 };
 
 export default EventIdPage;

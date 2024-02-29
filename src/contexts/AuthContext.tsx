@@ -4,22 +4,24 @@ import { db, firebaseApp, initFirebase } from "@/app/config/firebaseConfig";
 import { Organizer } from "@/app/types/organizer";
 import { User } from "@/app/types/user";
 import { ORGANIZERS } from "@/mock/organizers";
-import { useRouter } from "@/navigation";
-import { useCallback, useEffect, useState, createContext } from "react";
+import { usePathname, useRouter } from "@/navigation";
+import { useCallback, useEffect, useState, createContext, Dispatch, SetStateAction } from "react";
 
 type UserType = "ORGANIZER" | "USER";
 
 interface IAuthContext {
+  setCurrentUser: Dispatch<SetStateAction<User | Organizer | null>>;
   currentUser: User | Organizer | null;
-  login: (userType: UserType) => boolean;
+  saveCurrentUser: (data: User | Organizer, userId?: string) => void;
   logout: (userType: UserType) => void;
+  isSessionLoading: boolean;
 }
 
 const initialState: IAuthContext = {
+  setCurrentUser: () => {},
   currentUser: null,
-  login: (userType?: UserType) => {
-    return true;
-  },
+  isSessionLoading: false,
+  saveCurrentUser: (data: User | Organizer, userId?: string) => {},
   logout: (userType?: UserType) => {},
 };
 
@@ -27,43 +29,20 @@ export const AuthContext = createContext<IAuthContext>(initialState);
 
 const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
+  const pathname = usePathname();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentUser, setCurrentSession] = useState<User | Organizer | null>(null);
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
+  const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
 
-  const login = useCallback((userType: UserType = "USER") => {
-    const session: User = {
-      id: "1",
-      first_name: "Sila",
-      last_name: "Pakdeewong",
-      gender: "MALE",
-      dob: "18 December 2003",
-      nationality: "TH",
-      phone_number: "+6694-819-5617",
-      profile_image_src: "https://avatars.githubusercontent.com/u/53871704?v=4",
-      address:
-        "School of Information Technology, KMITL, 1, Chalong Krung 1, Ladkrabang, Bangkok 10520",
-      email: "sila.pak@xxxxx.com",
-      interests: [],
-      password: "",
-      saved_events: ["1", "2"],
-    };
-
-    if (userType === "USER") {
-      localStorage.setItem("currentUser", JSON.stringify(session));
-      setCurrentSession(session);
-    } else if (userType === "ORGANIZER") {
-      localStorage.setItem("currentUser", JSON.stringify(ORGANIZERS[0]));
-      setCurrentSession(ORGANIZERS[0]);
-    }
-
-    return true;
+  const saveCurrentUser = useCallback((data: User | Organizer, userId: string = "") => {
+    setCurrentUser({ ...data, id: userId });
+    localStorage.setItem("currentUser", JSON.stringify({ ...data, id: userId }));
   }, []);
 
   const logout = useCallback(
     (userType: UserType = "USER") => {
       localStorage.clear();
-      setCurrentSession(null);
+      setCurrentUser(null);
       if (userType === "USER") {
         router.replace("/login");
       } else if (userType === "ORGANIZER") {
@@ -76,15 +55,27 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (localStorage.getItem("currentUser")) {
-      const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
-      setCurrentSession(session);
+      const session = JSON.parse(localStorage.getItem("currentUser") || "");
+      setCurrentUser(session);
+
+      if (session && session.website) {
+        router.replace(pathname);
+      } else if (session && session.email) {
+        router.replace(pathname);
+      } else {
+        setIsSessionLoading(false);
+      }
     }
 
     initFirebase();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, login, logout }}>{children}</AuthContext.Provider>
+    <AuthContext.Provider
+      value={{ isSessionLoading, setCurrentUser, currentUser, saveCurrentUser, logout }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
 };
 

@@ -1,16 +1,27 @@
 "use client";
 
+import { db } from "@/app/config/firebaseConfig";
 import { Event } from "@/app/types/event";
+import { Organizer } from "@/app/types/organizer";
 import EventCard from "@/components/card/EventCard";
 import OrganizerCard from "@/components/card/OrganizerCard";
 import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
-import { EVENTS } from "@/mock/events";
-import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
-import { Avatar, Button, Card, DatePicker, DatePickerProps, Empty, Select, message } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  DatePicker,
+  DatePickerProps,
+  Empty,
+  Select,
+  Skeleton,
+  message,
+} from "antd";
 import Search, { SearchProps } from "antd/es/input/Search";
 import dayjs from "dayjs";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { MapPin, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
@@ -26,18 +37,31 @@ const HomePage = () => {
   const navbarContext = useContext(NavbarContext);
 
   const [eventLocation, setEventLocation] = useState<String>("All");
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>(EVENTS);
+  const [events, setEvents] = useState<Event[] | null>(null);
+  const [organizers, setOrganizers] = useState<Organizer[] | null>(null);
+  const [filteredEvents, setFilteredEvents] = useState<Event[] | null>(null);
   const [searchValue, setSearchValue] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    console.log(info?.source, value);
     setSearchValue(value);
+    console.log(events);
     const location = eventLocation === "Bangkok" ? "BKK" : "FK";
     if (!value && eventLocation === "All") {
-      setFilteredEvents(EVENTS);
+      setFilteredEvents(events);
+    } else if (value && eventLocation === "All") {
+      setFilteredEvents(
+        events && events.length > 0
+          ? events.filter((e) => e.event_name.toLowerCase().includes(value))
+          : []
+      );
     } else {
-      setFilteredEvents((prev) =>
-        prev.filter((e) => e.event_name.includes(value) && e.country === location)
+      setFilteredEvents(
+        events && events.length > 0
+          ? events.filter(
+              (e) => e.event_name.toLowerCase().includes(value) && e.country === location
+            )
+          : []
       );
     }
   };
@@ -47,8 +71,54 @@ const HomePage = () => {
     console.log(typeof date, typeof dateString);
   };
 
+  const fetchAllEvents = async () => {
+    const eventRef = collection(db, "events");
+    const q = query(eventRef);
+    const queryResult = await getDocs(q);
+
+    const events: Event[] = [];
+
+    queryResult.forEach((doc) => {
+      const event: Event = {
+        ...doc.data(),
+        end_date: new Date(doc.data().end_date.toDate()),
+        start_date: new Date(doc.data().start_date.toDate()),
+        id: doc.id,
+      } as Event;
+
+      if (event.end_date.getTime() > Date.now()) {
+        events.push(event);
+      }
+    });
+
+    setEvents(events);
+    setFilteredEvents(events);
+  };
+
+  const fetchAllOrganizers = async () => {
+    const organizerRef = collection(db, "organizers");
+    const q = query(organizerRef);
+    const queryResult = await getDocs(q);
+
+    const organizers: Organizer[] = [];
+    queryResult.forEach((doc) => {
+      organizers.push({ ...doc.data(), id: doc.id } as Organizer);
+    });
+
+    setOrganizers(organizers);
+  };
+
   useEffect(() => {
     navbarContext.setNavbarTitle("BangKuoka");
+
+    async function fetchData() {
+      await fetchAllEvents();
+      await fetchAllOrganizers();
+      setIsLoading(false);
+    }
+
+    fetchData();
+    console.log("Done!");
   }, [navbarContext]);
 
   return (
@@ -133,16 +203,28 @@ const HomePage = () => {
               size="large"
               onChange={(value) => {
                 setEventLocation(value);
-                const location = value === "Bangkok" ? "BKK" : "FK";
+                const location = value == "Bangkok" ? "BKK" : "FK";
                 if (value === "All" && !searchValue) {
-                  return setFilteredEvents(EVENTS);
-                } else if (value && !searchValue) {
-                  return setFilteredEvents(EVENTS.filter((e) => e.country === location));
+                  return setFilteredEvents(events);
+                } else if (value !== "All" && !searchValue) {
+                  return setFilteredEvents(
+                    events ? events.filter((e) => e.country == location) : []
+                  );
+                } else if (value === "All" && searchValue) {
+                  return setFilteredEvents(
+                    events
+                      ? events.filter((e) => e.event_name.toLowerCase().includes(searchValue))
+                      : []
+                  );
                 } else {
                   return setFilteredEvents(
-                    EVENTS.filter(
-                      (e) => e.country === location && e.event_name.includes(searchValue)
-                    )
+                    events
+                      ? events.filter(
+                          (e) =>
+                            e.country == location &&
+                            e.event_name.toLowerCase().includes(searchValue)
+                        )
+                      : []
                   );
                 }
               }}
@@ -182,7 +264,7 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("local_events_subtitle")}</div>
 
       <div className="grid grid-cols-2 gap-4">
-        {filteredEvents.length > 0 ? (
+        {filteredEvents && filteredEvents.length > 0 ? (
           filteredEvents
             .sort((a, b) => b.participant_num - a.participant_num)
             .map((event) => (
@@ -191,14 +273,22 @@ const HomePage = () => {
                 id={event.id}
                 eventImageSrc={event.event_image_src}
                 eventName={event.event_name}
-                description={event.description.substring(0, 50)}
+                description={(event.description && event.description.substring(0, 50)) || ""}
                 startDate={event.start_date}
                 categoryId={event.category_id}
               />
             ))
         ) : (
-          <Empty className="mt-6 mx-auto" />
+          <div>
+            {filteredEvents && filteredEvents.length === 0 && !isLoading && (
+              <Empty className="mt-6 mx-auto" />
+            )}
+          </div>
         )}
+      </div>
+
+      <div className="w-full mt-8">
+        <Skeleton active loading={isLoading} />
       </div>
 
       <div className="flex items-center justify-between mt-4">
@@ -217,7 +307,7 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("more_event_subtitle")}</div>
 
       <div className="grid grid-cols-2 gap-4">
-        {filteredEvents.length > 0 ? (
+        {filteredEvents && filteredEvents.length > 0 ? (
           filteredEvents
             .sort((a, b) => b.start_date.getTime() - a.start_date.getTime())
             .map((event) => (
@@ -226,14 +316,22 @@ const HomePage = () => {
                 id={event.id}
                 eventImageSrc={event.event_image_src}
                 eventName={event.event_name}
-                description={event.description.substring(0, 50)}
+                description={event.description ? event.description.substring(0, 50) : ""}
                 startDate={event.start_date}
                 categoryId={event.category_id}
               />
             ))
         ) : (
-          <Empty className="mt-6 mx-auto" />
+          <div>
+            {filteredEvents && filteredEvents.length === 0 && !isLoading && (
+              <Empty className="mt-6 mx-auto" />
+            )}
+          </div>
         )}
+      </div>
+
+      <div className="w-full mt-8">
+        <Skeleton active loading={isLoading} />
       </div>
 
       <div className="flex items-center justify-between mt-4">
@@ -251,8 +349,8 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("event_organizers_subtitle")}</div>
 
       <div className="grid grid-cols-2 gap-4">
-        {ORGANIZERS.length > 0 ? (
-          ORGANIZERS.map((organizer) => {
+        {organizers && organizers.length > 0 ? (
+          organizers.map((organizer) => {
             return (
               <OrganizerCard
                 key={organizer.id}
@@ -263,8 +361,16 @@ const HomePage = () => {
             );
           })
         ) : (
-          <Empty className="mt-6 mx-auto" />
+          <div>
+            {organizers && organizers.length === 0 && !isLoading && (
+              <Empty className="mt-6 mx-auto" />
+            )}
+          </div>
         )}
+      </div>
+
+      <div className="w-full mt-8">
+        <Skeleton active loading={isLoading} />
       </div>
     </div>
   );

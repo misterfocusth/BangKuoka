@@ -1,10 +1,16 @@
 "use client";
 
+import { db, storage } from "@/app/config/firebaseConfig";
+import { Event } from "@/app/types/event";
+import { Organizer } from "@/app/types/organizer";
+import { AuthContext } from "@/contexts/AuthContext";
 import { EVENTS } from "@/mock/events";
 import { useRouter } from "@/navigation";
 import { Button, DatePicker, GetProp, Image, Input, Switch, Upload, UploadProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import dayjs, { Dayjs } from "dayjs";
+import { addDoc, collection, doc, getDoc, updateDoc } from "firebase/firestore";
+import { UploadResult, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import {
   Bus,
   CalendarClock,
@@ -18,7 +24,9 @@ import {
   Ship,
   TrainFrontIcon,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { eventNames } from "process";
+import React, { useCallback, useContext, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 interface ManageEventIdPageParams {
   id: string;
@@ -33,26 +41,16 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 };
 
 const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
-  const eventData = EVENTS.find((e) => e.organizer_id == params.id);
-
   const router = useRouter();
+  const currentUser = useContext(AuthContext).currentUser as Organizer;
 
-  const [name, setName] = useState(eventData?.event_name || "");
-  const [description, setDescription] = useState(eventData?.description || "");
+  const [eventData, setEventData] = useState<Event | null>(null);
+
   const [imageUrl, setImageUrl] = useState(eventData?.event_image_src || "");
+  const [newImageUrl, setNewImageUrl] = useState("");
 
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs(eventData?.start_date) || null);
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs(eventData?.end_date) || null);
-
-  const [locationName, setLocationName] = useState(eventData?.loc_name || "");
-  const [locationAddress, setLocationAddress] = useState(eventData?.loc_address || "");
-
-  const [publicTransportation, setPublicTransportation] = useState({
-    bus: eventData?.trans_boat || "",
-    train: eventData?.trans_train || "",
-    boat: eventData?.trans_boat || "",
-    taxi: eventData?.trans_taxi || "",
-  });
 
   const [reservationOption, setReservationOption] = useState({
     isAvailableReservation: eventData?.is_allow_reserve || false,
@@ -62,13 +60,116 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
 
   const handleEventImageChange: UploadProps["onChange"] = (file) => {
     getBase64(file.file.originFileObj as FileType, (url) => {
-      setImageUrl(url);
+      setNewImageUrl(url);
     });
+  };
+
+  const getEvent = useCallback(async () => {
+    const docRef = doc(db, "events", params.id);
+    const docSnap = await getDoc(docRef);
+    const data = docSnap.data();
+
+    setEventData({
+      ...data,
+      id: docSnap.id,
+      start_date: new Date(data?.start_date.toDate()),
+      end_date: new Date(data?.end_date.toDate()),
+      organizer: currentUser,
+    } as Event);
+
+    setStartDate(dayjs(new Date(data?.start_date.toDate())));
+    setEndDate(dayjs(new Date(data?.end_date.toDate())));
+
+    setReservationOption({
+      isAvailableReservation: data?.is_allow_reserve,
+      isLimitParticipant: data?.is_limit_participant,
+      maxParticipants: data?.participant_num,
+    });
+
+    setImageUrl(data?.event_image_src);
+    setNewImageUrl(data?.event_image_src);
+  }, []);
+
+  useEffect(() => {
+    getEvent();
+  }, [getEvent]);
+
+  const validateFormData = () => {
+    const newEventData = {
+      event_name: eventData?.event_name,
+      start_date: eventData?.start_date,
+      end_date: eventData?.end_date,
+      loc_name: eventData?.loc_name,
+      loc_address: eventData?.loc_address,
+    };
+
+    for (let key of Object.keys(newEventData)) {
+      if (!newEventData[key as keyof typeof newEventData]) return false;
+    }
+    return true;
+  };
+
+  const uploadNewImageAndUpdate = (imageBlob: Blob, updateData: any) => {
+    let uploadedImageUrl = "";
+    const storageRef = ref(storage, "events/" + Date.now());
+    uploadBytes(storageRef, imageBlob)
+      .then((result: UploadResult) => {
+        return getDownloadURL(result.ref);
+      })
+      .then((url) => (uploadedImageUrl = url))
+      .then(() => {
+        return updateDoc(doc(db, "events", params.id), {
+          ...updateData,
+          event_image_src: uploadedImageUrl,
+        });
+      })
+      .then(() => {
+        toast.success("Successfully, updated event data.");
+        router.push("/organizer/event/manage/" + params.id);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleInputValueChange = (event: any) => {
+    const currentEventData: Event = eventData as Event;
+    setEventData({ ...currentEventData, [event.currentTarget.id]: event.currentTarget.value });
   };
 
   if (!eventData) return <></>;
 
-  const handleEditEvent = () => {};
+  const handleEditEvent = async () => {
+    console.log(eventData);
+
+    const isFormDataValid = validateFormData();
+    const isImageChange = imageUrl !== newImageUrl;
+
+    const updateData = {
+      event_name: eventData.event_name,
+      description: eventData.description,
+      start_date: startDate?.toDate(),
+      end_date: endDate?.toDate(),
+      loc_name: eventData.loc_name,
+      loc_address: eventData.loc_address,
+      trans_bus: eventData.trans_bus,
+      trans_train: eventData.trans_train,
+      trans_boat: eventData.trans_boat,
+      trans_taxi: eventData.trans_taxi,
+    };
+
+    if (!isFormDataValid) {
+      return toast.error("Error, incorrect form dara, or missing some fields.");
+    }
+
+    if (isImageChange) {
+      const imageBlob = await (await fetch(newImageUrl)).blob();
+      uploadNewImageAndUpdate(imageBlob, updateData);
+    } else {
+      updateDoc(doc(db, "events", params.id), updateData).then(() => {
+        toast.success("Successfully, updated event data.");
+        router.push("/organizer/event/manage/" + params.id);
+      });
+    }
+  };
   return (
     <div>
       <div className="flex flex-row items-center justify-between gap-2  mb-6">
@@ -109,9 +210,10 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
             <Input
               className="h-12"
               size="large"
-              value={name}
+              value={eventData.event_name}
+              id="event_name"
+              onChange={handleInputValueChange}
               placeholder={"e.g. Photo exhibition “Mitsuaki Iwago’s Japanese cat walk”"}
-              onChange={(e) => setName(e.currentTarget.value)}
             />
           </div>
 
@@ -121,10 +223,11 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
               placeholder={
                 "e.g. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,"
               }
-              value={description}
+              value={eventData.description}
+              id="description"
+              onChange={handleInputValueChange}
               size="large"
               rows={4}
-              onChange={(e) => setDescription(e.currentTarget.value)}
             />
           </div>
 
@@ -175,9 +278,10 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
             <Input
               className="h-12"
               size="large"
-              value={locationName}
+              value={eventData.loc_name}
+              id="loc_name"
               placeholder={"e.g. Century Park Hotel"}
-              onChange={(e) => setLocationName(e.currentTarget.value)}
+              onChange={handleInputValueChange}
             />
           </div>
 
@@ -187,10 +291,11 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
               placeholder={
                 "e.g. Bangkok City Hall (Sao Chingcha) 73 Dinso Road , Phra Nakhon District Bangkok 10200, Thailand"
               }
-              value={locationAddress}
+              value={eventData.loc_address}
               size="large"
               rows={4}
-              onChange={(e) => setLocationAddress(e.currentTarget.value)}
+              id="loc_address"
+              onChange={handleInputValueChange}
             />
           </div>
 
@@ -210,11 +315,10 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
               <Input
                 className="h-12"
                 size="large"
-                value={publicTransportation.bus}
+                value={eventData.trans_bus}
+                id="trans_bus"
                 placeholder={"e.g. 1 / 50 / 99"}
-                onChange={(e) =>
-                  setPublicTransportation((prev) => ({ ...prev, bus: e.currentTarget.value }))
-                }
+                onChange={handleInputValueChange}
               />
             </div>
 
@@ -223,11 +327,10 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
               <Input
                 className="h-12"
                 size="large"
-                value={publicTransportation.train}
+                value={eventData.trans_train}
+                id="trans_train"
                 placeholder={"e.g. BTS Phaya Thai Station: Exit 02"}
-                onChange={(e) =>
-                  setPublicTransportation((prev) => ({ ...prev, train: e.currentTarget.value }))
-                }
+                onChange={handleInputValueChange}
               />
             </div>
 
@@ -236,11 +339,10 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
               <Input
                 className="h-12"
                 size="large"
-                value={publicTransportation.boat}
+                value={eventData.trans_boat}
+                id="trans_boat"
                 placeholder={"e.g. Chao Phaya Pier"}
-                onChange={(e) =>
-                  setPublicTransportation((prev) => ({ ...prev, boat: e.currentTarget.value }))
-                }
+                onChange={handleInputValueChange}
               />
             </div>
 
@@ -249,11 +351,10 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
               <Input
                 className="h-12"
                 size="large"
-                value={publicTransportation.taxi}
+                value={eventData.trans_taxi}
+                id="trans_taxi"
                 placeholder={"e.g. Century Park Hotel nearby Victory Monument."}
-                onChange={(e) =>
-                  setPublicTransportation((prev) => ({ ...prev, taxi: e.currentTarget.value }))
-                }
+                onChange={handleInputValueChange}
               />
             </div>
           </div>
@@ -270,25 +371,24 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
             listType="picture-card"
             className="min-w-full flex flex-row items-center justify-center mt-6 "
             showUploadList={false}
-            disabled={!!imageUrl}
+            disabled={!!newImageUrl}
             onChange={handleEventImageChange}
           >
-            {imageUrl ? (
-              <div className="mt-12">
-                <Image
-                  src={imageUrl}
-                  alt="Event Image"
-                  className=" w-72 rounded-xl  object-cover"
-                />
-              </div>
-            ) : (
+            {!newImageUrl && (
               <div>
                 {" "}
                 <ImageIcon size={30} />
               </div>
             )}
           </Upload>
-          <div className={`${imageUrl ? "mt-16" : "mt-6"} font-semibold text-center`}>
+
+          {newImageUrl && (
+            <div>
+              <Image src={newImageUrl} alt="Event Image" className="  rounded-xl  object-cover" />
+            </div>
+          )}
+
+          <div className={`${imageUrl ? "mt-6" : "mt-6"} font-semibold text-center`}>
             Recommend Size is 1920 x 1080 px
           </div>
 
@@ -299,7 +399,7 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
                 danger
                 className="w-[75%]"
                 onClick={() => {
-                  setImageUrl("");
+                  setNewImageUrl("");
                 }}
               >
                 Delete an image

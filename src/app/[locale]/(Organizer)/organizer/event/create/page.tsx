@@ -1,9 +1,24 @@
 "use client";
 
+import { db, storage } from "@/app/config/firebaseConfig";
+import { Organizer } from "@/app/types/organizer";
+import { AuthContext } from "@/contexts/AuthContext";
 import { useRouter } from "@/navigation";
-import { Button, DatePicker, GetProp, Image, Input, Switch, Upload, UploadProps } from "antd";
+import {
+  Button,
+  DatePicker,
+  GetProp,
+  Image,
+  Input,
+  Select,
+  Switch,
+  Upload,
+  UploadProps,
+} from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { Dayjs } from "dayjs";
+import { addDoc, collection } from "firebase/firestore";
+import { UploadResult, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import {
   Bus,
   CalendarClock,
@@ -17,7 +32,8 @@ import {
   Ship,
   TrainFrontIcon,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import toast from "react-hot-toast";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -29,10 +45,12 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 
 const CreateEventPage = () => {
   const router = useRouter();
+  const currentUser = useContext(AuthContext).currentUser as Organizer;
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [selectedEventCategory, setSelectedEventCategory] = useState("0");
 
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -53,13 +71,96 @@ const CreateEventPage = () => {
     maxParticipants: 0,
   });
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleEventImageChange: UploadProps["onChange"] = (file) => {
     getBase64(file.file.originFileObj as FileType, (url) => {
       setImageUrl(url);
     });
   };
 
-  const handleCreateNewEvent = () => {};
+  const uploadAndCreate = (imageBlob: Blob, eventData: any) => {
+    let uploadedImageUrl = "";
+    const storageRef = ref(storage, "events/" + Date.now());
+    uploadBytes(storageRef, imageBlob)
+      .then((result: UploadResult) => {
+        return getDownloadURL(result.ref);
+      })
+      .then((url) => (uploadedImageUrl = url))
+      .then(() => {
+        return addDoc(collection(db, "events"), {
+          ...eventData,
+          event_image_src: uploadedImageUrl,
+        });
+      })
+      .then((result) => {
+        toast.success("Successfully, created new event!");
+        router.push("/organizer/event/manage/" + result.id);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const validateFormData = () => {
+    const newEventData = {
+      event_name: name,
+      category_id: selectedEventCategory,
+      start_date: startDate,
+      endDate: endDate,
+      loc_name: locationName,
+      loc_address: locationAddress,
+    };
+
+    for (let key of Object.keys(newEventData)) {
+      if (!newEventData[key as keyof typeof newEventData]) return false;
+    }
+    return true;
+  };
+
+  const handleCreateNewEvent = async () => {
+    if (!validateFormData()) {
+      toast.error("Event data incorrect please check your information, or some field is missing.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    console.log(currentUser);
+
+    const newEventData = {
+      event_name: name,
+      category_id: selectedEventCategory,
+      description: description,
+      start_date: startDate?.toDate(),
+      end_date: endDate?.toDate(),
+      loc_name: locationName,
+      loc_address: locationAddress,
+      trans_bus: publicTransportation.bus,
+      trans_train: publicTransportation.train,
+      trans_boat: publicTransportation.boat,
+      trans_taxi: publicTransportation.taxi,
+      participant_num: reservationOption.maxParticipants,
+      is_allow_reserve: reservationOption.isAvailableReservation,
+      is_limit_participant: reservationOption.isLimitParticipant,
+      organizer_id: currentUser.id,
+      country: currentUser.country == "TH" ? "BKK" : "FK",
+      views: 0,
+    };
+
+    if (imageUrl) {
+      const imageBlob = await (await fetch(imageUrl)).blob();
+      uploadAndCreate(imageBlob, newEventData);
+    } else {
+      addDoc(collection(db, "events"), newEventData)
+        .then((result) => {
+          toast.success("Successfully, created new event!");
+          router.push("/organizer/event/manage/" + result.id);
+        })
+        .catch((err) => console.log(err));
+    }
+
+    setIsLoading(false);
+  };
+
   return (
     <div>
       <div className="flex flex-row items-center justify-between gap-2  mb-6">
@@ -82,6 +183,7 @@ const CreateEventPage = () => {
             type="primary"
             className="flex items-center gap-1"
             onClick={handleCreateNewEvent}
+            loading={isLoading}
           >
             Save & Create Event
           </Button>
@@ -119,6 +221,32 @@ const CreateEventPage = () => {
             />
           </div>
 
+          <div className="mt-6 w-[90%]">
+            <p className="m-0 ml-1 mb-3 font-semibold text-[#0068B2]">{"Event Category"}</p>
+            <Select
+              defaultValue="0"
+              className="w-full h-12"
+              size="large"
+              onChange={setSelectedEventCategory}
+              value={selectedEventCategory}
+              options={[
+                { value: "0", label: "Technology" },
+                { value: "1", label: "Entertainment" },
+                { value: "2", label: "Art" },
+                { value: "3", label: "Music" },
+                { value: "4", label: "Film" },
+                { value: "5", label: "Lectures & Books" },
+                { value: "6", label: "Fashion" },
+                { value: "7", label: "Food & Drink" },
+                { value: "8", label: "Charities" },
+                { value: "9", label: "Sports & Active Life" },
+                { value: "10", label: "Kids & Family" },
+                { value: "12", label: "Festivals" },
+                { value: "11", label: "Other" },
+              ]}
+            />
+          </div>
+
           <div className="flex flex-row items-center gap-2 text-xl font-bold mt-8">
             <CalendarClock />
             Event Date and Time
@@ -136,7 +264,7 @@ const CreateEventPage = () => {
                 }}
                 showTime
                 needConfirm
-                className="w-[90%]"
+                className="w-[90%] h-12"
               />
             </div>
 
@@ -151,7 +279,7 @@ const CreateEventPage = () => {
                 }}
                 showTime
                 needConfirm
-                className="w-[90%]"
+                className="w-[90%] h-12"
               />
             </div>
           </div>

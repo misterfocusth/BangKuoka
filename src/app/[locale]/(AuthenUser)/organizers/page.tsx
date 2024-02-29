@@ -3,7 +3,7 @@ import React from "react";
 import OrganizersPageClient from "./OrganizersPageClient";
 
 const OrganizersPage = () => {
-  return <OrganizersPageClient organizers={ORGANIZERS} />;
+  return <OrganizersPageClient />;
 };
 
 export default OrganizersPage;

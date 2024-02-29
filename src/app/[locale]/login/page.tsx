@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // Image
 import Image from "next/image";
@@ -10,7 +10,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 
 // Antd
-import { Button, Divider, Input } from "antd";
+import { Button, Divider, Input, Spin } from "antd";
 import Password from "antd/es/input/Password";
 
 // Lucide Icon
@@ -21,20 +21,51 @@ import GoogleIcon from "@/components/icons/GoogleIcon";
 import { useRouter } from "@/navigation";
 
 import { AuthContext } from "@/contexts/AuthContext";
+import toast from "react-hot-toast";
+import { collection, doc, getDocs, query, where } from "firebase/firestore";
+import { auth, db } from "@/app/config/firebaseConfig";
+import { User } from "@/app/types/user";
 
 const LoginPage = () => {
-  const authContenxt = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
   const router = useRouter();
   const t = useTranslations("Index");
 
-  const handleLogin = () => {
-    const isLoggedIn = authContenxt.login("USER");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-    if (isLoggedIn) {
-      router.push("/home");
+  const handleLogin = async () => {
+    if (!email || !password) return toast.error("Please fill all fields.");
+
+    setIsLoading(true);
+
+    const userRef = collection(db, "users");
+    const q = query(userRef, where("email", "==", email));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty || querySnapshot.docs[0].data().password != password) {
+      toast.error("Invalid email or password.");
+      setIsLoading(false);
+      return;
     }
+
+    const user = querySnapshot.docs[0].data() as User;
+    authContext.saveCurrentUser(user, querySnapshot.docs[0].id);
+
+    setIsLoading(false);
+
+    toast.success("Welcome back, " + user.first_name + " " + user.last_name);
+    router.replace("/home");
   };
+
+  if (authContext.isSessionLoading)
+    return (
+      <div className="w-full h-full flex items-center justify-center flex-col">
+        <Spin size="large" />
+      </div>
+    );
 
   return (
     <div className=" relative min-h-screen z-10">
@@ -66,6 +97,8 @@ const LoginPage = () => {
             size="large"
             placeholder="Email"
             prefix={<Mail className="mr-2" />}
+            value={email}
+            onChange={(e) => setEmail(e.currentTarget.value)}
           />
           <Password
             className="py-3"
@@ -73,16 +106,19 @@ const LoginPage = () => {
             placeholder="Password"
             prefix={<KeyRound className="mr-2" />}
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.currentTarget.value)}
           />
         </div>
 
         <p className=" text-right mt-6 pr-2 text-[#136912]">{t("forgot_password_label")}</p>
 
         <Button
-          className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center animate-pulse"
+          className="w-full font-bold mt-6 p-6 flex flex-row items-center justify-center"
           size="large"
           type="primary"
           onClick={handleLogin}
+          loading={isLoading}
         >
           {t("login_button_title")}
         </Button>

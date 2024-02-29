@@ -5,11 +5,9 @@ export type Event = {
   event_name: string;
   event_image_src: string;
   category_id: number;
-  description: string;
+  description?: string;
   start_date: Date;
-  end_date: string;
-  start_time: string;
-  end_time: string;
+  end_date: Date;
   loc_name: string;
   loc_address: string;
   trans_bus?: string;
@@ -19,7 +17,7 @@ export type Event = {
   participant_num: number;
   is_allow_reserve: boolean;
   organizer_id: string;
-  unlisted_on: string | null;
+  unlisted_on?: string | null;
   country: "BKK" | "FK";
   views: number;
   is_limit_participant: boolean;

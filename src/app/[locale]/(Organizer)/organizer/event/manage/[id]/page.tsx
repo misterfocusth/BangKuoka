@@ -14,28 +14,36 @@ import {
   Settings,
   Users,
 } from "lucide-react";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import EventParticipantTable from "./EventParticipantTable";
 import { RESERVATIONS } from "@/mock/reservations";
+import { collection, deleteDoc, doc, getDoc, query, updateDoc } from "firebase/firestore";
+import { db } from "@/app/config/firebaseConfig";
+import { Event } from "@/app/types/event";
+import { AuthContext } from "@/contexts/AuthContext";
+import { Organizer } from "@/app/types/organizer";
 
 interface ManageEventIdPageParams {
   id: string;
 }
 
 const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
+  const currentUser = useContext(AuthContext).currentUser as Organizer;
   const router = useRouter();
-  const eventData = EVENTS.find((e) => e.id == params.id);
 
-  const [isAvailableForReservation, setIsAvailableForReservation] = useState(
-    eventData?.is_allow_reserve || false
-  );
+  const [eventData, setEventData] = useState<Event | null>(null);
+
+  const [isAvailableForReservation, setIsAvailableForReservation] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
   const eventParticipants = RESERVATIONS.filter((e) => e.event_id == params.id);
 
-  const handleReservationOptionChange = (checked: boolean) => {
+  const handleReservationOptionChange = async (checked: boolean) => {
     setIsAvailableForReservation(checked);
+    await updateDoc(doc(db, "events", params.id), {
+      is_allow_reserve: checked,
+    });
     if (checked) {
       toast.success("Successfully, Reservation are now available.");
     } else {
@@ -43,13 +51,41 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
     }
   };
 
+  const handleDelete = () => {
+    if (confirm("Are you confirm to delete this event, this operation can't be revert.")) {
+      deleteDoc(doc(db, "events", params.id)).then(() => {
+        toast.success("Your event has been deleted!");
+        router.push("/organizer/dashboard");
+      });
+    }
+  };
+
+  const getEvent = async () => {
+    const docRef = doc(db, "events", params.id);
+    const docSnap = await getDoc(docRef);
+    const eventData = docSnap.data();
+    setEventData({
+      ...eventData,
+      id: docSnap.id,
+      start_date: new Date(eventData?.start_date.toDate()),
+      end_date: new Date(eventData?.end_date.toDate()),
+      organizer: currentUser,
+    } as Event);
+    setIsAvailableForReservation(eventData!.is_allow_reserve);
+  };
+
+  useEffect(() => {
+    getEvent();
+    console.log(eventData);
+  }, []);
+
   if (!eventData) {
     return <></>;
   }
 
   return (
     <div>
-      <div className="flex flex-row items-center justify-between gap-2  mb-6">
+      <div className="flex flex-row items-center justify-between gap-2  mb-4">
         <div className="flex flex-row items-center gap-2 text-xl font-bold">
           <Settings />
           Organizer Tools - Event Management & Stats
@@ -60,10 +96,19 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
             size="large"
             type="default"
             className="flex items-center gap-2"
-            onClick={() => router.back()}
+            onClick={() => router.push("/organizer/dashboard")}
           >
             <LucideChevronLeft size={20} />
             Back to Dashboard
+          </Button>
+          <Button
+            size="large"
+            type="primary"
+            className="flex items-center gap-2"
+            onClick={handleDelete}
+            danger
+          >
+            Delete
           </Button>
           <Button
             size="large"
@@ -76,6 +121,8 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
           </Button>
         </div>
       </div>
+
+      <div className="text-lg font-semibold mb-4 text-[#0068B2]">{eventData.event_name}</div>
 
       <div className="grid grid-cols-3 gap-6">
         <div className="col-span-1">
@@ -98,13 +145,15 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
             </div>
           </div>
 
-          <div className="mt-8">
-            <Image
-              src={eventData?.event_image_src}
-              alt="Event Image"
-              className=" w-full rounded-xl  object-cover"
-            />
-          </div>
+          {eventData.event_image_src && (
+            <div className="mt-8">
+              <Image
+                src={eventData?.event_image_src}
+                alt="Event Image"
+                className=" w-full rounded-xl  object-cover"
+              />
+            </div>
+          )}
         </div>
 
         <div className=" col-span-2">
@@ -114,9 +163,13 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
               <div className="text-lg">
                 <div className="text-[#0068B2] font-semibold">{"Event Date"}</div>
                 <div className="">
-                  {eventData.start_date.toUTCString() +
+                  {eventData.start_date.toLocaleDateString() +
+                    " " +
+                    eventData.start_date.toLocaleTimeString() +
                     " - " +
-                    new Date(eventData.end_date).toUTCString()}
+                    eventData.end_date.toLocaleDateString() +
+                    " " +
+                    eventData.end_date.toLocaleTimeString()}
                 </div>
               </div>
             </div>
@@ -152,13 +205,15 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
           </div>
         </div>
 
-        <div className="font-semibold text-lg flex items-center gap-2 mt-4">
-          <Switch
-            value={isAvailableForReservation}
-            onChange={(checked) => handleReservationOptionChange(checked)}
-          />
-          Available for Reservation
-        </div>
+        {new Date().getTime() < eventData.start_date.getTime() && (
+          <div className="font-semibold text-lg flex items-center gap-2 mt-4">
+            <Switch
+              value={isAvailableForReservation}
+              onChange={(checked) => handleReservationOptionChange(checked)}
+            />
+            Available for Reservation
+          </div>
+        )}
       </div>
 
       <Input

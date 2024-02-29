@@ -10,9 +10,7 @@ export const EVENTS: Event[] = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     start_date: new Date("2024-02-27 18:00:00"),
-    end_date: "20 Dec 2024",
-    start_time: "18.00",
-    end_time: "20.00",
+    end_date: new Date("2024-12-20 18:00:00"),
     loc_name: "Siam Paragon",
     loc_address: "991/1 Rama I Rd, Rong Muang, Pathum Wan, Bangkok 10330",
     trans_bus: "93 AC / 2-44 REG (54 REG) / ",
@@ -35,9 +33,7 @@ export const EVENTS: Event[] = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     start_date: new Date("2024-04-30 16:00:00"),
-    end_date: "20 Dec 2024",
-    start_time: "18.00",
-    end_time: "20.00",
+    end_date: new Date("2024-12-20 18:00:00"),
     loc_name: "Prince Mahidol Hall, Mahidol University",
     loc_address: "Prince Mahidol Hall, Mahidol University (Salaya), Bangkok Thailand 10310",
     trans_bus: "Life Park Rama 9 Bus Station",
@@ -59,9 +55,7 @@ export const EVENTS: Event[] = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     start_date: new Date("2024-04-13 23:59:00"),
-    end_date: "20 Dec 2024",
-    start_time: "18.00",
-    end_time: "20.00",
+    end_date: new Date("2024-12-20 18:00:00"),
     loc_name: "Bangkok City Hall (Sao Chingcha)",
     loc_address:
       "Bangkok City Hall (Sao Chingcha) 73 Dinso Road , Phra Nakhon District Bangkok 10200, Thailand",
@@ -86,9 +80,7 @@ export const EVENTS: Event[] = [
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     start_date: new Date("2024-02-29 19:30:00"),
-    end_date: "20 Dec 2024",
-    start_time: "18.00",
-    end_time: "20.00",
+    end_date: new Date("2024-12-20 18:00:00"),
     loc_name: "Prince Mahidol Hall, Mahidol University",
     loc_address: "Prince Mahidol Hall, Mahidol University (Salaya), Bangkok Thailand 10310",
     trans_bus: "Life Park Rama 9 Bus Station",

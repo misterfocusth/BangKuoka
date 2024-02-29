@@ -1,9 +1,7 @@
 "use client";
 
-export default function Home() {
-  if (window !== undefined) {
-    window.location.href = "/en/login";
-  }
+import { redirect } from "@/navigation";
 
-  return <></>;
+export default function Home() {
+  return redirect("/login");
 }

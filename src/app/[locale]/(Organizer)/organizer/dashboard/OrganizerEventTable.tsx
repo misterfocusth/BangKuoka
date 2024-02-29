@@ -70,13 +70,17 @@ const OrganizerEventTable: React.FC<OrganizerEventTableProps> = ({
       title: "Start Time",
       dataIndex: "startDateTime",
       key: "startDateTime",
-      render: (value: Date) => <div>{value.toUTCString()}</div>,
+      render: (value: Date) => (
+        <div>{value.toLocaleDateString("en-US") + " " + value.toLocaleTimeString("en-US")}</div>
+      ),
     },
     {
       title: "End Time",
       dataIndex: "endDateTime",
       key: "endDateTime",
-      render: (value: Date) => <div>{value.toUTCString()}</div>,
+      render: (value: Date) => (
+        <div>{value.toLocaleDateString("en-US") + " " + value.toLocaleTimeString("en-US")}</div>
+      ),
     },
     {
       title: "Participant(s)",
@@ -88,7 +92,9 @@ const OrganizerEventTable: React.FC<OrganizerEventTableProps> = ({
       dataIndex: "isAvailableReservation",
       key: "isAvailableReservation",
       render: (_, record) =>
-        record.isAvailableReservation ? (
+        new Date().getTime() > record.endDateTime.getTime() ? (
+          <div>Ended</div>
+        ) : record.isAvailableReservation ? (
           <div className="text-green-500">Available</div>
         ) : (
           <div className="text-red-500">Not Available</div>

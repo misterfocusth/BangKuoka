@@ -1,36 +1,35 @@
 "use client";
 
+import { db } from "@/app/config/firebaseConfig";
 import { Organizer } from "@/app/types/organizer";
 import OrganizerCard from "@/components/OrganizerCard";
 import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
-import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
-import { AutoComplete, Input, Select } from "antd";
+import { AutoComplete, Input, Select, Skeleton } from "antd";
+import { collection, getDocs, query } from "firebase/firestore";
 import { Search } from "lucide-react";
 import { useTranslations } from "next-intl";
-import React, { useContext, useEffect, useState } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 
-interface OrganizersPageClientProps {
-  organizers: Organizer[];
-}
-
-const OrganizersPageClient: React.FC<OrganizersPageClientProps> = ({ organizers }) => {
+const OrganizersPageClient = () => {
   const router = useRouter();
   const authContext = useContext(AuthContext);
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
 
-  const [organizerLists, setOrganizersList] = useState<Organizer[]>(organizers);
+  const [organizers, setOrganizers] = useState<Organizer[]>([]);
+  const [organizerLists, setOrganizersList] = useState<Organizer[] | null>(null);
   const [organizersLocation, setOrganizersLocation] = useState("0");
   const [searchValue, setSearchValue] = useState("");
   const [options, setOptions] = useState<{ value: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const getPanelValue = (searchText: string) =>
     !searchText
       ? []
       : organizers
-          .filter((organizer) => organizer.name.includes(searchText))
+          .filter((organizer) => organizer.name.toLowerCase().includes(searchText.toLowerCase()))
           .map((organizer) => ({ value: organizer.name }));
 
   const onSelect = (data: string) => {
@@ -39,7 +38,26 @@ const OrganizersPageClient: React.FC<OrganizersPageClientProps> = ({ organizers 
 
   useEffect(() => {
     navbarContext.setNavbarTitle(t("organizers_label"));
+
+    async function fetchAllOrganizers() {
+      const organizerRef = collection(db, "organizers");
+      const q = query(organizerRef);
+      const queryResult = await getDocs(q);
+
+      const organizers: Organizer[] = [];
+
+      queryResult.forEach((doc) => {
+        organizers.push({ ...doc.data(), id: doc.id } as Organizer);
+      });
+
+      setOrganizersList(organizers);
+      setOrganizers(organizers);
+      setIsLoading(false);
+    }
+
+    fetchAllOrganizers();
   }, [t, navbarContext]);
+
   return (
     <div className="pb-32">
       <div className="text-lg font-bold">{t("organizers_title")}</div>
@@ -57,11 +75,13 @@ const OrganizersPageClient: React.FC<OrganizersPageClientProps> = ({ organizers 
             if (!text) {
               setOrganizersList(organizers);
             } else {
-              setOrganizersList(organizers.filter((o) => o.name.includes(text)));
+              setOrganizersList(
+                organizers.filter((o) => o.name.toLowerCase().includes(text.toLowerCase()))
+              );
             }
 
             if (organizersLocation === "1") {
-              setOrganizersList((prev) => prev.filter((o) => o.country === "TH"));
+              setOrganizersList((prev) => prev && prev.filter((o) => o.country === "TH"));
             }
           }}
           placeholder={t("search_organizer_placeholder")}
@@ -83,7 +103,11 @@ const OrganizersPageClient: React.FC<OrganizersPageClientProps> = ({ organizers 
             }
 
             if (searchValue) {
-              setOrganizersList((prev) => prev.filter((o) => o.name.includes(searchValue)));
+              setOrganizersList(
+                (prev) =>
+                  prev &&
+                  prev.filter((o) => o.name.toLowerCase().includes(searchValue.toLowerCase()))
+              );
             }
             setOrganizersLocation(value);
           }}
@@ -97,17 +121,21 @@ const OrganizersPageClient: React.FC<OrganizersPageClientProps> = ({ organizers 
       </div>
 
       <div className="w-full flex flex-col gap-4 mt-6">
-        {organizerLists.map((o) => (
-          <OrganizerCard
-            key={o.id}
-            id={o.id}
-            name={o.name}
-            description={o.description}
-            image_src={o.icon_image_src}
-            country={o.country}
-          />
-        ))}
+        {organizerLists &&
+          organizerLists.length > 0 &&
+          organizerLists.map((o) => (
+            <OrganizerCard
+              key={o.id}
+              id={o.id}
+              name={o.name}
+              description={o.description}
+              image_src={o.icon_image_src}
+              country={o.country}
+            />
+          ))}
       </div>
+
+      <Skeleton active loading={isLoading} />
     </div>
   );
 };

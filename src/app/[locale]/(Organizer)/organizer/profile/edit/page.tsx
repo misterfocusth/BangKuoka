@@ -20,6 +20,10 @@ import {
 } from "lucide-react";
 import React, { useContext, useState } from "react";
 import ProfilePreview from "./ProfilePreview";
+import { doc, updateDoc } from "firebase/firestore";
+import { db, storage } from "@/app/config/firebaseConfig";
+import toast from "react-hot-toast";
+import { UploadResult, getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0];
 
@@ -31,6 +35,7 @@ const getBase64 = (img: FileType, callback: (url: string) => void) => {
 
 const EditOrganizerProfilePage = () => {
   const router = useRouter();
+  const authContext = useContext(AuthContext);
   const currentUser = useContext(AuthContext).currentUser as Organizer;
   const [imageUrl, setImageUrl] = useState(currentUser?.icon_image_src || "");
 
@@ -46,6 +51,72 @@ const EditOrganizerProfilePage = () => {
     getBase64(file.file.originFileObj as FileType, (url) => {
       setImageUrl(url);
     });
+  };
+
+  const uploadAndUpdate = (imageBlob: Blob, updateData: any) => {
+    let uploadedImageUrl = "";
+    const storageRef = ref(storage, "profiles/organizer/" + Date.now());
+    uploadBytes(storageRef, imageBlob)
+      .then((result: UploadResult) => {
+        return getDownloadURL(result.ref);
+      })
+      .then((url) => (uploadedImageUrl = url))
+      .then(() => {
+        return updateDoc(doc(db, "organizers", currentUser.id), {
+          ...updateData,
+          icon_image_src: uploadedImageUrl,
+        });
+      })
+      .then(() => {
+        toast.success("Your organizer's profile has been updated.");
+        router.push("/organizer/profile");
+        authContext.saveCurrentUser(
+          { ...currentUser, ...updateData, icon_image_src: uploadedImageUrl },
+          currentUser.id
+        );
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const handleEditOrganizerProfile = async () => {
+    const newOrganizerData = {
+      name,
+      phone_number: phoneNumber,
+      address,
+      description,
+      website,
+      email,
+    };
+
+    const isImageChange = imageUrl !== currentUser.icon_image_src;
+
+    let updateData = {};
+
+    for (let key of Object.keys(newOrganizerData)) {
+      if (
+        newOrganizerData[key as keyof typeof newOrganizerData] !==
+        currentUser[key as keyof typeof currentUser]
+      ) {
+        updateData = {
+          ...updateData,
+          [key]: newOrganizerData[key as keyof typeof newOrganizerData],
+        };
+      }
+    }
+
+    if (isImageChange) {
+      const imageBlob = await (await fetch(imageUrl)).blob();
+      uploadAndUpdate(imageBlob, updateData);
+      console.log("IMG CHA");
+    } else {
+      updateDoc(doc(db, "organizers", currentUser.id), updateData)
+        .then(() => {
+          toast.success("Your organizer's profile has been updated.");
+          router.push("/organizer/profile");
+          authContext.saveCurrentUser({ ...currentUser, ...updateData }, currentUser.id);
+        })
+        .catch((err) => console.log(err));
+    }
   };
 
   if (!currentUser) {
@@ -134,6 +205,7 @@ const EditOrganizerProfilePage = () => {
               size="large"
               onChange={setSelectedCountry}
               value={selectedCountry}
+              disabled
               options={[
                 { value: "TH", label: "Bangkok, Thailand" },
                 { value: "JP", label: "Fukuoka, Japan" },
@@ -164,7 +236,12 @@ const EditOrganizerProfilePage = () => {
           </div>
 
           <div className="w-full flex flex-col gap-4 items-start mt-8">
-            <Button type="default" size="large" className="w-[90%] bg-[#0068B2] text-white">
+            <Button
+              type="default"
+              size="large"
+              className="w-[90%] bg-[#0068B2] text-white"
+              onClick={handleEditOrganizerProfile}
+            >
               Save Change
             </Button>
             <Button size="large" className="w-[90%]" onClick={() => router.back()}>

@@ -10,6 +10,8 @@ import { EVENTS } from "@/mock/events";
 import { AuthContext } from "@/contexts/AuthContext";
 import { Organizer } from "@/app/types/organizer";
 import { CalendarDaysIcon } from "lucide-react";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/app/config/firebaseConfig";
 
 const getListData = (value: Dayjs, events: Event[] | null) => {
   let listData;
@@ -21,36 +23,35 @@ const getListData = (value: Dayjs, events: Event[] | null) => {
     )
     .sort((a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime())
     .map((e) => ({ type: "processing", content: e.event_name }));
-
-  console.log(listData);
   return listData || [];
-};
-
-const getMonthData = (value: Dayjs) => {
-  if (value.month() === 8) {
-    return 1394;
-  }
 };
 
 const CalendarPage = () => {
   const currentUser = useContext(AuthContext).currentUser as Organizer;
-  const [events, setEvents] = useState<Event[] | null>(
-    EVENTS.filter((e) => e.organizer_id == currentUser?.id || "")
-  );
+  const [events, setEvents] = useState<Event[] | null>(null);
+
+  const getEvents = async () => {
+    const eventRef = collection(db, "events");
+    const q = query(eventRef, where("organizer_id", "==", currentUser?.id));
+    const querySnapshot = await getDocs(q);
+
+    let events: Event[] = [];
+    for (let event of querySnapshot.docs) {
+      events.push({
+        ...event.data(),
+        id: event.id,
+        start_date: new Date(event.data().start_date.toDate()),
+        end_date: new Date(event.data().end_date.toDate()),
+        organizer: currentUser,
+      } as Event);
+    }
+
+    setEvents(events);
+  };
 
   useEffect(() => {
-    setEvents(EVENTS.filter((e) => e.organizer_id == currentUser?.id || ""));
+    getEvents();
   }, [currentUser]);
-
-  //   const monthCellRender = (value: Dayjs) => {
-  //     const num = getMonthData(value);
-  //     return num ? (
-  //       <div className="notes-month">
-  //         <section>{num}</section>
-  //         <span>Backlog number</span>
-  //       </div>
-  //     ) : null;
-  //   };
 
   const dateCellRender = (value: Dayjs) => {
     const listData = getListData(value, events);
