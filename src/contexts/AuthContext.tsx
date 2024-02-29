@@ -52,8 +52,13 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (localStorage.getItem("currentUser")) {
-      const session: User = JSON.parse(localStorage.getItem("currentUser") || "");
-      setCurrentUser(session);
+      const session = JSON.parse(localStorage.getItem("currentUser") || "");
+
+      if (session.website) {
+        setCurrentUser(session as Organizer);
+      } else {
+        setCurrentUser(session as User);
+      }
     }
 
     initFirebase();
