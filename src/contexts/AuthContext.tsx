@@ -31,7 +31,7 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
 
   const saveCurrentUser = useCallback((data: User | Organizer, userId: string = "") => {
@@ -57,14 +57,13 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
     if (localStorage.getItem("currentUser")) {
       const session = JSON.parse(localStorage.getItem("currentUser") || "");
       setCurrentUser(session);
-
-      if (session && session.website) {
-        router.replace(pathname);
-      } else if (session && session.email) {
-        router.replace(pathname);
-      } else {
-        setIsSessionLoading(false);
+      if (session.website) {
+        router.replace(pathname === "/organizer" ? "/organizer/dashboard" : pathname);
+      } else if (session.email) {
+        router.replace(pathname === "/login" ? "/home" : pathname);
       }
+    } else {
+      setIsSessionLoading(false);
     }
 
     initFirebase();
