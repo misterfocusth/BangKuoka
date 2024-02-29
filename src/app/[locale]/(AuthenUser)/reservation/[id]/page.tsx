@@ -7,9 +7,7 @@ interface EventIdPageParams {
 }
 
 const ReservationIdPage = ({ params }: { params: EventIdPageParams }) => {
-  const eventId = params.id;
-  const reservation = RESERVATIONS.find((e) => e.id === eventId)!;
-  return <ReservationIdPageClient reservation={reservation} />;
+  return <ReservationIdPageClient reservationId={params.id} />;
 };
 
 export default ReservationIdPage;

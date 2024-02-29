@@ -1,30 +1,76 @@
 "use client";
 
+import { db } from "@/app/config/firebaseConfig";
+import { Event } from "@/app/types/event";
 import { Organizer } from "@/app/types/organizer";
 import GoogleMap from "@/components/GoogleMap";
 import EventCard from "@/components/card/EventCard";
 import { NavbarContext } from "@/contexts/NavbarContext";
-import { EVENTS } from "@/mock/events";
-import { Empty, Select } from "antd";
+import { Empty, Select, Skeleton } from "antd";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 import { Globe2, Mail, MapPin, Phone } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { FC, useContext, useEffect, useState } from "react";
 
 interface OrganizerIdPageClientProps {
-  organizer: Organizer;
+  organizerId: string;
 }
 
-const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizer }) => {
+const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizerId }) => {
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
-  const [eventType, setEventType] = useState("0");
-  const originalEvents = EVENTS.filter((e) => e.organizer_id === organizer.id);
-  const [events, setEvents] = useState(originalEvents);
+  const [eventType, setEventType] = useState("1");
+  const [organizer, setOrganizer] = useState<Organizer | null>(null);
+  const [events, setEvents] = useState<Event[] | null>(null);
+  const [filteredEvents, setFilteredEvents] = useState<Event[] | null>(null);
+  const [isLoading, setLoading] = useState(true);
 
   useEffect(() => {
     navbarContext.setNavbarTitle(t("organizer_profile_label"));
-  }, [t, navbarContext]);
+
+    async function fetchOrganizerData() {
+      const organizerRef = doc(db, "organizers", organizerId);
+      const organizerDocRef = getDoc(organizerRef);
+
+      const eventsRef = collection(db, "events");
+      const q = query(eventsRef, where("organizer_id", "==", organizerId));
+      const querySnapshot = getDocs(q);
+
+      Promise.all([organizerDocRef, querySnapshot]).then((res) => {
+        console.log(res[0].data());
+
+        let events: Event[] = [];
+
+        res[1].forEach((doc) => {
+          console.log(doc.data());
+          events.push({
+            ...doc.data(),
+            id: doc.id,
+            start_date: new Date(doc.data().start_date.toDate()),
+            end_date: new Date(doc.data().end_date.toDate()),
+          } as Event);
+        });
+
+        setOrganizer({ ...res[0].data(), id: organizerId } as Organizer);
+        setEvents(events);
+        setFilteredEvents(
+          events.filter((e) => new Date(e.end_date).getTime() >= new Date().getTime())
+        );
+        setLoading(false);
+      });
+    }
+    fetchOrganizerData();
+  }, []);
+
+  if (!organizer || !events || !filteredEvents || isLoading) {
+    return (
+      <div className="mt-6">
+        <Skeleton active loading />
+      </div>
+    );
+  }
+
   return (
     <div className="mb-32">
       <div className="w-full shadow rounded-xl p-4">
@@ -108,18 +154,14 @@ const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizer }) =>
           size="large"
           onChange={(value) => {
             if (value === "0") {
-              setEvents(originalEvents);
+              setFilteredEvents(events);
             } else if (value === "1") {
-              setEvents(
-                originalEvents.filter(
-                  (e) => new Date(e.start_date).getTime() >= new Date().getTime()
-                )
+              setFilteredEvents(
+                events.filter((e) => new Date(e.end_date).getTime() >= new Date().getTime())
               );
             } else if (value === "2") {
-              setEvents(
-                originalEvents.filter(
-                  (e) => new Date(e.start_date).getTime() < new Date().getTime()
-                )
+              setFilteredEvents(
+                events.filter((e) => new Date(e.end_date).getTime() < new Date().getTime())
               );
             }
 
@@ -135,8 +177,8 @@ const OrganizerIdPageClient: FC<OrganizerIdPageClientProps> = ({ organizer }) =>
       </div>
 
       <div className="flex items-center gap-4">
-        {events.length > 0 ? (
-          events.map((event) => (
+        {filteredEvents.length > 0 ? (
+          filteredEvents.map((event) => (
             <EventCard
               key={event.id}
               id={event.id}

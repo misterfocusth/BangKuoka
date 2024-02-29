@@ -109,7 +109,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId }) => {
     }
 
     fetchData();
-  }, [eventId, navbarContext]);
+  }, []);
 
   if (!eventData || isLoading) {
     return (

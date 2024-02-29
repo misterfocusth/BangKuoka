@@ -1,10 +1,15 @@
 "use client";
 
+import { db } from "@/app/config/firebaseConfig";
+import { Event } from "@/app/types/event";
+import { Organizer } from "@/app/types/organizer";
 import { Reservation } from "@/app/types/reservation";
 import EventCategoryChip from "@/components/chip/EventCategoryChip";
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
-import { Button } from "antd";
+import { Button, Skeleton } from "antd";
+import { doc, getDoc } from "firebase/firestore";
+import { get } from "http";
 import {
   Bus,
   CalendarDays,
@@ -20,18 +25,20 @@ import {
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { QRCodeSVG } from "qrcode.react";
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface ReservationIdPageClientProps {
-  reservation: Reservation;
+  reservationId: string;
 }
 
-const ReservationIdPageClient: React.FC<ReservationIdPageClientProps> = ({ reservation }) => {
+const ReservationIdPageClient: React.FC<ReservationIdPageClientProps> = ({ reservationId }) => {
   const router = useRouter();
   const navbarContext = useContext(NavbarContext);
   const t = useTranslations("Index");
 
+  const [reservation, setReservation] = useState<Reservation | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const handleCancelReservation = () => {
     if (confirm()) {
       toast.success("Your reservation has been cancel.");
@@ -39,9 +46,91 @@ const ReservationIdPageClient: React.FC<ReservationIdPageClientProps> = ({ reser
     }
   };
 
+  const promiseAll = async (obj: any) => {
+    if (obj && typeof obj.then == "function") obj = await obj;
+    if (!obj || typeof obj != "object") return obj;
+    const forWaiting: any = [];
+    Object.keys(obj).forEach((k) => {
+      if (obj[k] && typeof obj[k].then == "function")
+        forWaiting.push(obj[k].then((res: any) => (obj[k] = res)));
+      if (obj[k] && typeof obj[k] == "object") forWaiting.push(promiseAll(obj[k]));
+    });
+    await Promise.all(forWaiting);
+    return obj;
+  };
+
   useEffect(() => {
     navbarContext.setNavbarTitle(t("my_reservation_info_label"));
-  }, [navbarContext, t]);
+
+    async function getEventDataById(eventId: string) {
+      // Get event data
+      const eventRef = doc(db, "events", eventId);
+      const eventDocSnap = await getDoc(eventRef);
+
+      // Get organizer data
+      const organizerRef = doc(db, "organizers", eventDocSnap.data()!.organizer_id);
+      const organizerDocSnap = await getDoc(organizerRef);
+
+      // Convert firebase object to event data object.
+      const event = eventDocSnap.data() as Event;
+      const organizer = organizerDocSnap.data() as Organizer;
+      event.organizer = organizer;
+
+      return {
+        ...event,
+        id: eventDocSnap.id,
+        start_date: new Date(eventDocSnap.data()!.start_date.toDate()),
+        end_date: new Date(eventDocSnap.data()!.end_date.toDate()),
+      } as Event;
+    }
+
+    async function getUserDataById(userId: string) {
+      const docRef = doc(db, "users", userId);
+      const docSnap = await getDoc(docRef);
+      const userData = docSnap.data();
+
+      if (!userData) return;
+
+      return {
+        ...userData,
+        id: docSnap.id,
+      };
+    }
+
+    async function fetchData() {
+      const docRef = doc(db, "reservations", reservationId);
+      const docSnap = await getDoc(docRef);
+      const reservationData = docSnap.data();
+
+      if (!reservationData) return;
+
+      const event = await getEventDataById(reservationData.event_id);
+      const user = await getUserDataById(reservationData.user_id);
+
+      const reservation = {
+        ...reservationData,
+        id: docSnap.id,
+        reserve_on: new Date(reservationData.reserve_on),
+        event: event,
+        user: user,
+      };
+
+      console.log(reservation);
+
+      setReservation(reservation as Reservation);
+      setIsLoading(false);
+    }
+
+    fetchData();
+  }, []);
+
+  if (!reservation || !reservation.event || isLoading) {
+    return (
+      <div className="mt-6">
+        <Skeleton active loading />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-32">
@@ -66,7 +155,13 @@ const ReservationIdPageClient: React.FC<ReservationIdPageClientProps> = ({ reser
           <div className="w-4/5">
             <div className="text-[#0068B2] font-semibold">{t("event_date_label")}</div>
             <div className="mt-1 text-sm">
-              {reservation.event?.start_date + " - " + reservation.event?.end_date}
+              {reservation.event.start_date.toLocaleDateString("en-US") +
+                " " +
+                reservation.event.start_date.toLocaleTimeString("en-US") +
+                " - " +
+                reservation.event.end_date.toLocaleDateString("en-US") +
+                " " +
+                reservation.event.end_date.toLocaleTimeString("en-US")}
             </div>
           </div>
         </div>

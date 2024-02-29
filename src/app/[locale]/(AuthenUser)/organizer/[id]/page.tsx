@@ -8,9 +8,8 @@ interface EventIdPageParams {
 
 const OrganizerIdPage = ({ params }: { params: EventIdPageParams }) => {
   const organizerId = params.id;
-  const organizer = ORGANIZERS.find((o) => o.id === organizerId)!;
 
-  return <OrganizerIdPageClient organizer={organizer} />;
+  return <OrganizerIdPageClient organizerId={organizerId} />;
 };
 
 export default OrganizerIdPage;
