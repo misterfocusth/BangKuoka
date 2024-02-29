@@ -2,13 +2,23 @@
 
 import { db } from "@/app/config/firebaseConfig";
 import { Event } from "@/app/types/event";
+import { Organizer } from "@/app/types/organizer";
 import EventCard from "@/components/card/EventCard";
 import OrganizerCard from "@/components/card/OrganizerCard";
 import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
-import { ORGANIZERS } from "@/mock/organizers";
 import { useRouter } from "@/navigation";
-import { Avatar, Button, Card, DatePicker, DatePickerProps, Empty, Select, message } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  DatePicker,
+  DatePickerProps,
+  Empty,
+  Select,
+  Skeleton,
+  message,
+} from "antd";
 import Search, { SearchProps } from "antd/es/input/Search";
 import dayjs from "dayjs";
 import { collection, getDocs, query, where } from "firebase/firestore";
@@ -28,8 +38,10 @@ const HomePage = () => {
 
   const [eventLocation, setEventLocation] = useState<String>("All");
   const [events, setEvents] = useState<Event[] | null>(null);
+  const [organizers, setOrganizers] = useState<Organizer[] | null>(null);
   const [filteredEvents, setFilteredEvents] = useState<Event[] | null>(null);
   const [searchValue, setSearchValue] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
     setSearchValue(value);
@@ -83,9 +95,30 @@ const HomePage = () => {
     setFilteredEvents(events);
   };
 
+  const fetchAllOrganizers = async () => {
+    const organizerRef = collection(db, "organizers");
+    const q = query(organizerRef);
+    const queryResult = await getDocs(q);
+
+    const organizers: Organizer[] = [];
+    queryResult.forEach((doc) => {
+      organizers.push({ ...doc.data(), id: doc.id } as Organizer);
+    });
+
+    setOrganizers(organizers);
+  };
+
   useEffect(() => {
     navbarContext.setNavbarTitle("BangKuoka");
-    fetchAllEvents();
+
+    async function fetchData() {
+      await fetchAllEvents();
+      await fetchAllOrganizers();
+      setIsLoading(false);
+    }
+
+    fetchData();
+    console.log("Done!");
   }, [navbarContext]);
 
   return (
@@ -246,8 +279,16 @@ const HomePage = () => {
               />
             ))
         ) : (
-          <Empty className="mt-6 mx-auto" />
+          <div>
+            {filteredEvents && filteredEvents.length === 0 && !isLoading && (
+              <Empty className="mt-6 mx-auto" />
+            )}
+          </div>
         )}
+      </div>
+
+      <div className="w-full mt-8">
+        <Skeleton active loading={isLoading} />
       </div>
 
       <div className="flex items-center justify-between mt-4">
@@ -281,8 +322,16 @@ const HomePage = () => {
               />
             ))
         ) : (
-          <Empty className="mt-6 mx-auto" />
+          <div>
+            {filteredEvents && filteredEvents.length === 0 && !isLoading && (
+              <Empty className="mt-6 mx-auto" />
+            )}
+          </div>
         )}
+      </div>
+
+      <div className="w-full mt-8">
+        <Skeleton active loading={isLoading} />
       </div>
 
       <div className="flex items-center justify-between mt-4">
@@ -300,8 +349,8 @@ const HomePage = () => {
       <div className="text-[#555555] mt-1">{t("event_organizers_subtitle")}</div>
 
       <div className="grid grid-cols-2 gap-4">
-        {ORGANIZERS.length > 0 ? (
-          ORGANIZERS.map((organizer) => {
+        {organizers && organizers.length > 0 ? (
+          organizers.map((organizer) => {
             return (
               <OrganizerCard
                 key={organizer.id}
@@ -312,8 +361,16 @@ const HomePage = () => {
             );
           })
         ) : (
-          <Empty className="mt-6 mx-auto" />
+          <div>
+            {organizers && organizers.length === 0 && !isLoading && (
+              <Empty className="mt-6 mx-auto" />
+            )}
+          </div>
         )}
+      </div>
+
+      <div className="w-full mt-8">
+        <Skeleton active loading={isLoading} />
       </div>
     </div>
   );
