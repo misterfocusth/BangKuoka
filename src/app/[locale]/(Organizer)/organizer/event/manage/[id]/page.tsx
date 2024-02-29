@@ -18,11 +18,21 @@ import { useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import EventParticipantTable from "./EventParticipantTable";
 import { RESERVATIONS } from "@/mock/reservations";
-import { collection, deleteDoc, doc, getDoc, query, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import { db } from "@/app/config/firebaseConfig";
 import { Event } from "@/app/types/event";
 import { AuthContext } from "@/contexts/AuthContext";
 import { Organizer } from "@/app/types/organizer";
+import { User } from "@/app/types/user";
 
 interface ManageEventIdPageParams {
   id: string;
@@ -33,11 +43,10 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
   const router = useRouter();
 
   const [eventData, setEventData] = useState<Event | null>(null);
+  const [eventParticipants, setEventParticipants] = useState<any[]>([]);
 
   const [isAvailableForReservation, setIsAvailableForReservation] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-
-  const eventParticipants = RESERVATIONS.filter((e) => e.event_id == params.id);
 
   const handleReservationOptionChange = async (checked: boolean) => {
     setIsAvailableForReservation(checked);
@@ -74,9 +83,47 @@ const ManageEventIdPage = ({ params }: { params: ManageEventIdPageParams }) => {
     setIsAvailableForReservation(eventData!.is_allow_reserve);
   };
 
+  const promiseAll = async (obj: any) => {
+    if (obj && typeof obj.then == "function") obj = await obj;
+    if (!obj || typeof obj != "object") return obj;
+    const forWaiting: any = [];
+    Object.keys(obj).forEach((k) => {
+      if (obj[k] && typeof obj[k].then == "function")
+        forWaiting.push(obj[k].then((res: any) => (obj[k] = res)));
+      if (obj[k] && typeof obj[k] == "object") forWaiting.push(promiseAll(obj[k]));
+    });
+    await Promise.all(forWaiting);
+    return obj;
+  };
+
   useEffect(() => {
     getEvent();
+
+    async function getUserById(userId: string) {
+      const docRef = doc(db, "users", userId);
+      const docSnap = await getDoc(docRef);
+      return { ...docSnap.data(), id: docSnap.id } as User;
+    }
+
+    async function fetchEventParticipants() {
+      const q = query(collection(db, "reservations"), where("event_id", "==", params.id));
+      const querySnapshot = await getDocs(q);
+      const participants = querySnapshot.docs.map((doc) => ({
+        ...doc.data(),
+        id: doc.id,
+        user: getUserById(doc.data().user_id),
+        reserve_on: new Date(doc.data().reserve_on),
+      }));
+
+      promiseAll(participants).then((res) => {
+        console.log(res);
+        setEventParticipants(res);
+      });
+    }
+
+    fetchEventParticipants();
     console.log(eventData);
+    console.log(eventParticipants);
   }, []);
 
   if (!eventData) {
