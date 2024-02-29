@@ -10,7 +10,7 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
 import { Button, Skeleton } from "antd";
-import { doc, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, runTransaction } from "firebase/firestore";
 import {
   Bus,
   CalendarDays,
@@ -37,15 +37,43 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId }) => {
 
   const [eventData, setEventData] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isReserving, setIsReserving] = useState(false);
 
   const router = useRouter();
   const t = useTranslations("Index");
   const navbarContext = useContext(NavbarContext);
 
-  const handleMakeReservation = () => {
-    if (confirm()) {
-      toast.success("Make reservation complete.");
-      router.push("/reservation/" + "1");
+  const handleMakeReservation = async () => {
+    if (!confirm("Are you confirm to book this event?")) return;
+
+    setIsReserving(true);
+
+    try {
+      await runTransaction(db, async (transaction) => {
+        const event = await transaction.get(doc(db, "events", eventId));
+        const reservation = await addDoc(collection(db, "reservations"), {
+          user_id: currentUser.id,
+          event_id: eventData?.id,
+          status_id: 0,
+          reserve_on: Date.now(),
+          ticket_amount: 1,
+        });
+
+        const newEventViewer = event.data()!.viewer + 1;
+        const newEventParticipant = event.data()!.participant_num + 1;
+        transaction.update(event.ref, {
+          viewer: newEventViewer,
+          participant_num: newEventParticipant,
+        });
+
+        toast.success("Reservation has been made successfully!");
+        router.push("/reservation/" + reservation.id);
+      });
+
+      setIsReserving(false);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      setIsReserving(false);
     }
   };
 
@@ -168,6 +196,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId }) => {
         size="large"
         type="primary"
         onClick={handleMakeReservation}
+        loading={isReserving}
       >
         {t("make_reservation_button_label")}
       </Button>

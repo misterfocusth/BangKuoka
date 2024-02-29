@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 // Image
 import Image from "next/image";
@@ -10,7 +10,7 @@ import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 
 // Antd
-import { Button, Divider, Input } from "antd";
+import { Button, Divider, Input, Spin } from "antd";
 import Password from "antd/es/input/Password";
 
 // Lucide Icon
@@ -23,11 +23,11 @@ import { useRouter } from "@/navigation";
 import { AuthContext } from "@/contexts/AuthContext";
 import toast from "react-hot-toast";
 import { collection, doc, getDocs, query, where } from "firebase/firestore";
-import { db } from "@/app/config/firebaseConfig";
+import { auth, db } from "@/app/config/firebaseConfig";
 import { User } from "@/app/types/user";
 
 const LoginPage = () => {
-  const authContenxt = useContext(AuthContext);
+  const authContext = useContext(AuthContext);
 
   const router = useRouter();
   const t = useTranslations("Index");
@@ -52,13 +52,20 @@ const LoginPage = () => {
     }
 
     const user = querySnapshot.docs[0].data() as User;
-    authContenxt.saveCurrentUser(user, querySnapshot.docs[0].id);
+    authContext.saveCurrentUser(user, querySnapshot.docs[0].id);
 
     setIsLoading(false);
 
     toast.success("Welcome back, " + user.first_name + " " + user.last_name);
     router.replace("/home");
   };
+
+  if (authContext.isSessionLoading)
+    return (
+      <div className="w-full h-full flex items-center justify-center flex-col">
+        <Spin size="large" />
+      </div>
+    );
 
   return (
     <div className=" relative min-h-screen z-10">

@@ -14,11 +14,13 @@ interface IAuthContext {
   currentUser: User | Organizer | null;
   saveCurrentUser: (data: User | Organizer, userId?: string) => void;
   logout: (userType: UserType) => void;
+  isSessionLoading: boolean;
 }
 
 const initialState: IAuthContext = {
   setCurrentUser: () => {},
   currentUser: null,
+  isSessionLoading: false,
   saveCurrentUser: (data: User | Organizer, userId?: string) => {},
   logout: (userType?: UserType) => {},
 };
@@ -28,7 +30,7 @@ export const AuthContext = createContext<IAuthContext>(initialState);
 const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
 
   const saveCurrentUser = useCallback((data: User | Organizer, userId: string = "") => {
@@ -53,11 +55,14 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (localStorage.getItem("currentUser")) {
       const session = JSON.parse(localStorage.getItem("currentUser") || "");
+      setCurrentUser(session);
 
-      if (session.website) {
-        setCurrentUser(session as Organizer);
+      if (session && session.website) {
+        router.replace("/organizer/dashboard");
+      } else if (session && session.email) {
+        router.replace("/home");
       } else {
-        setCurrentUser(session as User);
+        setIsSessionLoading(false);
       }
     }
 
@@ -65,7 +70,9 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ setCurrentUser, currentUser, saveCurrentUser, logout }}>
+    <AuthContext.Provider
+      value={{ isSessionLoading, setCurrentUser, currentUser, saveCurrentUser, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
