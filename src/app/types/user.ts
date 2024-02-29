@@ -2,7 +2,7 @@ export type User = {
   id: string;
   first_name: string;
   last_name: string;
-  dob: string;
+  dob: Date;
   gender: "MALE" | "FEMALE";
   nationality: "TH" | "JP";
   phone_number: string;

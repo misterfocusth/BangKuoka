@@ -12,14 +12,14 @@ type UserType = "ORGANIZER" | "USER";
 interface IAuthContext {
   setCurrentUser: Dispatch<SetStateAction<User | Organizer | null>>;
   currentUser: User | Organizer | null;
-  saveCurrentUser: (data: User | Organizer, userId: string) => void;
+  saveCurrentUser: (data: User | Organizer, userId?: string) => void;
   logout: (userType: UserType) => void;
 }
 
 const initialState: IAuthContext = {
   setCurrentUser: () => {},
   currentUser: null,
-  saveCurrentUser: (data: User | Organizer, userId: string) => {},
+  saveCurrentUser: (data: User | Organizer, userId?: string) => {},
   logout: (userType?: UserType) => {},
 };
 
@@ -31,36 +31,9 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
 
-  const saveCurrentUser = useCallback((data: User | Organizer, userId: string) => {
-    const session: User = {
-      id: "1",
-      first_name: "Sila",
-      last_name: "Pakdeewong",
-      gender: "MALE",
-      dob: "18 December 2003",
-      nationality: "TH",
-      phone_number: "+6694-819-5617",
-      profile_image_src: "https://avatars.githubusercontent.com/u/53871704?v=4",
-      address:
-        "School of Information Technology, KMITL, 1, Chalong Krung 1, Ladkrabang, Bangkok 10520",
-      email: "sila.pak@xxxxx.com",
-      interests: [],
-      password: "",
-      saved_events: ["1", "2"],
-    };
-
-    // if (userType === "USER") {
-    //   localStorage.setItem("currentUser", JSON.stringify(session));
-    //   setCurrentUser(session);
-    // } else if (userType === "ORGANIZER") {
-    //   localStorage.setItem("currentUser", JSON.stringify(ORGANIZERS[0]));
-    //   setCurrentUser(ORGANIZERS[0]);
-    // }
-
+  const saveCurrentUser = useCallback((data: User | Organizer, userId: string = "") => {
     setCurrentUser({ ...data, id: userId });
     localStorage.setItem("currentUser", JSON.stringify({ ...data, id: userId }));
-
-    return true;
   }, []);
 
   const logout = useCallback(

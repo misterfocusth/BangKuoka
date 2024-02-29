@@ -46,7 +46,6 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
 
   const [eventData, setEventData] = useState<Event | null>(null);
 
-  const [name, setName] = useState(eventData?.event_name || "");
   const [imageUrl, setImageUrl] = useState(eventData?.event_image_src || "");
   const [newImageUrl, setNewImageUrl] = useState("");
 
@@ -99,7 +98,7 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
     const newEventData = {
       event_name: eventData?.event_name,
       start_date: eventData?.start_date,
-      endDate: eventData?.end_date,
+      end_date: eventData?.end_date,
       loc_name: eventData?.loc_name,
       loc_address: eventData?.loc_address,
     };
@@ -148,7 +147,7 @@ const EditEventPage = ({ params }: { params: ManageEventIdPageParams }) => {
       event_name: eventData.event_name,
       description: eventData.description,
       start_date: startDate?.toDate(),
-      endDate: endDate?.toDate(),
+      end_date: endDate?.toDate(),
       loc_name: eventData.loc_name,
       loc_address: eventData.loc_address,
       trans_bus: eventData.trans_bus,

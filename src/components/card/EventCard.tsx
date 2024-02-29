@@ -33,7 +33,7 @@ const EventCard: React.FC<EventCardProps> = ({
         width={1920}
         height={1080}
         alt="event image"
-        className=" h-28 w-full  rounded-t-xl"
+        className=" h-28 w-full  rounded-t-xl object-cover"
       />
 
       <div className="p-2 flex flex-col gap-2">
