@@ -2,14 +2,19 @@
 
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
-import { DatePicker, DatePickerProps, Empty, Select, Tabs, TabsProps } from "antd";
+import { DatePicker, DatePickerProps, Empty, Select, Skeleton, Tabs, TabsProps } from "antd";
 import { SearchProps } from "antd/es/input";
 import dayjs from "dayjs";
 import { useTranslations } from "next-intl";
 import React, { useContext, useEffect, useState } from "react";
-import { RESERVATIONS } from "@/mock/reservations";
 import WideEventCard from "./WideEventCard";
 import { AuthContext } from "@/contexts/AuthContext";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { db } from "@/app/config/firebaseConfig";
+import { Reservation } from "@/app/types/reservation";
+import { Event } from "@/app/types/event";
+import { Organizer } from "@/app/types/organizer";
+import { set } from "firebase/database";
 
 const dateFormat = "DD MMMM YYYY";
 
@@ -28,21 +33,21 @@ const ReservationPageClient = () => {
     console.log(typeof date, typeof dateString);
   };
 
-  const [userEventByStatus, setUserEventByStatus] = useState(
-    RESERVATIONS.filter((e) => e.user_id === authContext.currentUser?.id && e.status_id === 0)
-  );
+  const [userReservations, setUserReservations] = useState<Reservation[]>([]);
+  const [userEventByStatus, setUserEventByStatus] = useState<Reservation[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const onTabChange = (key: string) => {
     setCurrentTab(key);
     setUserEventByStatus(
       eventLocation
-        ? RESERVATIONS.filter(
+        ? userReservations.filter(
             (e) =>
               e.user_id === authContext.currentUser?.id &&
               e.status_id === Number(key) &&
               e.event?.country === eventLocation
           )
-        : RESERVATIONS.filter(
+        : userReservations.filter(
             (e) => e.user_id === authContext.currentUser?.id && e.status_id === Number(key)
           )
     );
@@ -54,9 +59,82 @@ const ReservationPageClient = () => {
     { key: "2", label: t("canceled_label"), children: <></> },
   ];
 
+  const promiseAll = async (obj: any) => {
+    if (obj && typeof obj.then == "function") obj = await obj;
+    if (!obj || typeof obj != "object") return obj;
+    const forWaiting: any = [];
+    Object.keys(obj).forEach((k) => {
+      if (obj[k] && typeof obj[k].then == "function")
+        forWaiting.push(obj[k].then((res: any) => (obj[k] = res)));
+      if (obj[k] && typeof obj[k] == "object") forWaiting.push(promiseAll(obj[k]));
+    });
+    await Promise.all(forWaiting);
+    return obj;
+  };
+
   useEffect(() => {
     navbarContext.setNavbarTitle(t("my_reservations_label"));
-  }, [navbarContext, t]);
+
+    async function getEventDataById(eventId: string) {
+      // Get event data
+      const eventRef = doc(db, "events", eventId);
+      const eventDocSnap = await getDoc(eventRef);
+
+      // Get organizer data
+      const organizerRef = doc(db, "organizers", eventDocSnap.data()!.organizer_id);
+      const organizerDocSnap = await getDoc(organizerRef);
+
+      // Convert firebase object to event data object.
+      const event = eventDocSnap.data() as Event;
+      const organizer = organizerDocSnap.data() as Organizer;
+      event.organizer = organizer;
+
+      return {
+        ...event,
+        id: eventDocSnap.id,
+        start_date: new Date(eventDocSnap.data()!.start_date.toDate()),
+        end_date: new Date(eventDocSnap.data()!.end_date.toDate()),
+      } as Event;
+    }
+
+    const fetchTest = async () => {
+      const reservationRef = collection(db, "reservations");
+      const q = query(reservationRef, where("user_id", "==", authContext.currentUser?.id));
+      const querySnapshot = await getDocs(q);
+
+      const reservations: any[] = [];
+
+      querySnapshot.forEach((doc) => {
+        const reservation = {
+          ...doc.data(),
+          id: doc.id,
+          reserve_on: new Date(doc.data().reserve_on),
+          event: getEventDataById(doc.data().event_id),
+        };
+
+        reservations.push(reservation);
+      });
+
+      promiseAll(reservations).then((res) => {
+        setUserReservations(
+          res.sort(
+            (a: Reservation, b: Reservation) => b.reserve_on.getTime() - a.reserve_on.getTime()
+          )
+        );
+        setUserEventByStatus(res.filter((e: any) => e.status_id == 0));
+        setIsLoading(false);
+      });
+    };
+
+    fetchTest();
+  }, [authContext.currentUser, navbarContext]);
+
+  if (isLoading)
+    return (
+      <div className="mt-6">
+        <Skeleton active loading />
+      </div>
+    );
 
   return (
     <div className="mb-32">
@@ -74,7 +152,7 @@ const ReservationPageClient = () => {
               onChange={(value: string) => {
                 if (value) {
                   setUserEventByStatus(
-                    RESERVATIONS.filter(
+                    userReservations.filter(
                       (e) =>
                         e.user_id === authContext.currentUser?.id &&
                         e.status_id === Number(currentTab) &&
@@ -113,7 +191,7 @@ const ReservationPageClient = () => {
       </div>
 
       <div>
-        {userEventByStatus.length > 0 ? (
+        {userEventByStatus && userEventByStatus.length > 0 ? (
           userEventByStatus.map((reservation) => (
             <WideEventCard
               key={reservation.id}

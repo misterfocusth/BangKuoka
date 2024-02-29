@@ -4,7 +4,7 @@ import { db, firebaseApp, initFirebase } from "@/app/config/firebaseConfig";
 import { Organizer } from "@/app/types/organizer";
 import { User } from "@/app/types/user";
 import { ORGANIZERS } from "@/mock/organizers";
-import { useRouter } from "@/navigation";
+import { usePathname, useRouter } from "@/navigation";
 import { useCallback, useEffect, useState, createContext, Dispatch, SetStateAction } from "react";
 
 type UserType = "ORGANIZER" | "USER";
@@ -29,6 +29,7 @@ export const AuthContext = createContext<IAuthContext>(initialState);
 
 const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
+  const pathname = usePathname();
 
   const [isSessionLoading, setIsSessionLoading] = useState<boolean>(true);
   const [currentUser, setCurrentUser] = useState<User | Organizer | null>(null);
@@ -58,9 +59,9 @@ const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
       setCurrentUser(session);
 
       if (session && session.website) {
-        router.replace("/organizer/dashboard");
+        router.replace(pathname);
       } else if (session && session.email) {
-        router.replace("/home");
+        router.replace(pathname);
       } else {
         setIsSessionLoading(false);
       }

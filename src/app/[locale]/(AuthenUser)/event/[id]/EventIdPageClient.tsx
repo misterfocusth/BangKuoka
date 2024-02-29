@@ -10,7 +10,7 @@ import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
 import { Button, Skeleton } from "antd";
-import { addDoc, collection, doc, getDoc, runTransaction } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, runTransaction, updateDoc } from "firebase/firestore";
 import {
   Bus,
   CalendarDays,
@@ -59,7 +59,7 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId }) => {
           ticket_amount: 1,
         });
 
-        const newEventViewer = event.data()!.viewer + 1;
+        const newEventViewer = event.data()!.views + 1;
         const newEventParticipant = event.data()!.participant_num + 1;
         transaction.update(event.ref, {
           viewer: newEventViewer,
@@ -98,6 +98,10 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId }) => {
         start_date: new Date(eventDocSnap.data()!.start_date.toDate()),
         end_date: new Date(eventDocSnap.data()!.end_date.toDate()),
       };
+
+      await updateDoc(eventRef, {
+        views: eventDocSnap.data()!.views + 1,
+      });
 
       navbarContext.setNavbarTitle(eventData.event_name);
       setIsLoading(false);
