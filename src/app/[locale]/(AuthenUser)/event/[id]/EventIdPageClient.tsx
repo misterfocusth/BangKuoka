@@ -1,13 +1,16 @@
 "use client";
 
+import { db } from "@/app/config/firebaseConfig";
 import { Event } from "@/app/types/event";
+import { Organizer } from "@/app/types/organizer";
 import { User } from "@/app/types/user";
 import SaveEventButton from "@/components/button/SaveEventButton";
 import EventCategoryChip from "@/components/chip/EventCategoryChip";
 import { AuthContext } from "@/contexts/AuthContext";
 import { NavbarContext } from "@/contexts/NavbarContext";
 import { useRouter } from "@/navigation";
-import { Button } from "antd";
+import { Button, Skeleton } from "antd";
+import { doc, getDoc } from "firebase/firestore";
 import {
   Bus,
   CalendarDays,
@@ -20,23 +23,24 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import React, { useContext } from "react";
+import React, { use, useContext, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 interface EventIdPageClientProps {
   eventId: string;
-  eventData: Event;
 }
 
-const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventData }) => {
+const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId }) => {
   const authContext = useContext(AuthContext);
   const currentUser = authContext.currentUser as User;
   const isUserSaveEvent = currentUser?.saved_events?.some((e) => e === eventId);
 
+  const [eventData, setEventData] = useState<Event | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const router = useRouter();
   const t = useTranslations("Index");
   const navbarContext = useContext(NavbarContext);
-  navbarContext.setNavbarTitle(eventData.event_name);
 
   const handleMakeReservation = () => {
     if (confirm()) {
@@ -44,6 +48,44 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
       router.push("/reservation/" + "1");
     }
   };
+
+  useEffect(() => {
+    async function fetchData() {
+      // Get event data
+      const eventRef = doc(db, "events", eventId);
+      const eventDocSnap = await getDoc(eventRef);
+
+      // Get organizer data
+      const organizerRef = doc(db, "organizers", eventDocSnap.data()!.organizer_id);
+      const organizerDocSnap = await getDoc(organizerRef);
+
+      // Convert firebase object to event data object.
+      const event = eventDocSnap.data() as Event;
+      const organizer = organizerDocSnap.data() as Organizer;
+      event.organizer = organizer;
+
+      const eventData: Event = {
+        ...event,
+        id: eventDocSnap.id,
+        start_date: new Date(eventDocSnap.data()!.start_date.toDate()),
+        end_date: new Date(eventDocSnap.data()!.end_date.toDate()),
+      };
+
+      navbarContext.setNavbarTitle(eventData.event_name);
+      setIsLoading(false);
+      setEventData(eventData);
+    }
+
+    fetchData();
+  }, [eventId, navbarContext]);
+
+  if (!eventData || isLoading) {
+    return (
+      <div className="mt-6">
+        <Skeleton active loading />
+      </div>
+    );
+  }
 
   return (
     <div className="mb-20">
@@ -70,7 +112,15 @@ const EventIdPageClient: React.FC<EventIdPageClientProps> = ({ eventId, eventDat
           <CalendarDays />
           <div>
             <div className="text-[#0068B2] font-semibold">{t("event_date_label")}</div>
-            <div className="mt-1 text-sm">{eventData.start_date + " - " + eventData.end_date}</div>
+            <div className="mt-1 text-sm">
+              {eventData.start_date.toLocaleDateString("en-US") +
+                " " +
+                eventData.start_date.toLocaleTimeString("en-US") +
+                " - " +
+                eventData.end_date.toLocaleDateString("en-US") +
+                " " +
+                eventData.end_date.toLocaleTimeString("en-US")}
+            </div>
           </div>
         </div>
 
